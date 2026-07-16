@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Accountant Panel | BU-MARKET{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-4 bg-primary-bu text-white rounded-3">
+            <h2 class="fw-bold mb-1">Accountant Portal</h2>
+            <p class="mb-0">Verify payment references and receipts to approve seller plans and buyer memberships.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Seller Subscription Approvals -->
+    <div class="col-12 mb-5">
+        <div class="card border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-4 d-flex align-items-center">
+                <i class="bi bi-wallet2 text-primary-bu me-2"></i> Pending Seller Subscriptions
+            </h4>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Seller</th>
+                            <th>Plan Requested</th>
+                            <th>Amount</th>
+                            <th>Reference ID</th>
+                            <th>Receipt Screenshot</th>
+                            <th>Submitted Date</th>
+                            <th class="text-end">Verification Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sub in pending_subs %}
+                            <tr>
+                                <td class="fw-bold">{{ sub.seller.username }}</td>
+                                <td><span class="badge bg-primary-bu">{{ sub.plan.name }}</span></td>
+                                <td>{{ sub.amount_paid }} UGX</td>
+                                <td><code>{{ sub.payment_reference }}</code></td>
+                                <td>
+                                    {% if sub.receipt_image %}
+                                        <a href="{{ sub.receipt_image.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-image"></i> View Receipt
+                                        </a>
+                                    {% else %}
+                                        <span class="text-danger small">No Receipt</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ sub.submitted_at|date:"M d, H:i" }}</td>
+                                <td class="text-end">
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <a href="{% url 'subscriptions:approve_seller' sub.pk %}" class="btn btn-sm btn-success px-3">
+                                            <i class="bi bi-check-lg"></i> Approve
+                                        </a>
+                                        <a href="{% url 'subscriptions:reject_seller' sub.pk %}" class="btn btn-sm btn-danger px-3">
+                                            <i class="bi bi-x-lg"></i> Reject
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    <i class="bi bi-check-circle-fill text-success fs-3 d-block mb-2"></i>
+                                    No pending seller subscription approvals.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buyer Membership Approvals -->
+    <div class="col-12 mb-4">
+        <div class="card border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-4 d-flex align-items-center">
+                <i class="bi bi-award-fill text-primary-bu me-2"></i> Pending Buyer Memberships
+            </h4>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Buyer</th>
+                            <th>Amount Paid</th>
+                            <th>Receipt Screenshot</th>
+                            <th>Submitted Date</th>
+                            <th class="text-end">Verification Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mem in pending_buyers %}
+                            <tr>
+                                <td class="fw-bold">{{ mem.buyer.username }}</td>
+                                <td>{{ mem.amount_paid }} UGX</td>
+                                <td>
+                                    {% if mem.receipt_image %}
+                                        <a href="{{ mem.receipt_image.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-image"></i> View Receipt
+                                        </a>
+                                    {% else %}
+                                        <span class="text-danger small">No Receipt</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ mem.submitted_at|date:"M d, H:i" }}</td>
+                                <td class="text-end">
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <a href="{% url 'subscriptions:approve_buyer' mem.pk %}" class="btn btn-sm btn-success px-3">
+                                            <i class="bi bi-check-lg"></i> Approve
+                                        </a>
+                                        <a href="{% url 'subscriptions:reject_buyer' mem.pk %}" class="btn btn-sm btn-danger px-3">
+                                            <i class="bi bi-x-lg"></i> Reject
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    <i class="bi bi-check-circle-fill text-success fs-3 d-block mb-2"></i>
+                                    No pending buyer membership approvals.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

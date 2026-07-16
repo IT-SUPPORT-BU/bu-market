@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Apply Subscription | BU-MARKET{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Pricing plans guidelines -->
+    <div class="col-lg-5 mb-4">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <h4 class="fw-bold mb-4 text-primary-bu">Select Your Subscription Plan</h4>
+            
+            <div class="list-group mb-4">
+                <div class="list-group-item border-0 bg-light p-3 mb-2 rounded shadow-sm">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="fw-bold mb-1">BASIC</h5>
+                        <span class="text-primary-bu fw-bold">20,000 UGX/mo</span>
+                    </div>
+                    <ul class="small mb-0 ps-3 mt-2 text-muted">
+                        <li>Maximum of 2 active listings</li>
+                        <li>No seller badge</li>
+                        <li>Promoted ads disabled</li>
+                    </ul>
+                </div>
+                
+                <div class="list-group-item border-0 bg-light p-3 mb-2 rounded shadow-sm">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="fw-bold mb-1">SILVER <span class="badge badge-silver text-uppercase small">SILVER</span></h5>
+                        <span class="text-primary-bu fw-bold">30,000 UGX/mo</span>
+                    </div>
+                    <ul class="small mb-0 ps-3 mt-2 text-muted">
+                        <li>Maximum of 5 active listings</li>
+                        <li>SILVER verified badge</li>
+                        <li>Promoted ads enabled</li>
+                    </ul>
+                </div>
+                
+                <div class="list-group-item border-0 bg-light p-3 mb-2 rounded shadow-sm">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="fw-bold mb-1">GOLD <span class="badge badge-gold text-uppercase small">GOLD</span></h5>
+                        <span class="text-primary-bu fw-bold">50,000 UGX/mo</span>
+                    </div>
+                    <ul class="small mb-0 ps-3 mt-2 text-muted">
+                        <li>Maximum of 10 active listings</li>
+                        <li>GOLD verified badge</li>
+                        <li>Promoted ads enabled</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="bg-warning-subtle text-warning-emphasis p-3 rounded small">
+                <h6 class="fw-bold"><i class="bi bi-wallet2"></i> Payment Procedure:</h6>
+                <ol class="mb-0 ps-3">
+                    <li>Send Mobile Money payment to accountant reference.</li>
+                    <li>Note down the Transaction ID / Payment Reference.</li>
+                    <li>Upload a screenshot of the payment receipt using the form.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Application Form -->
+    <div class="col-lg-7 mb-4">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <h4 class="fw-bold mb-4">Submit Payment Receipt</h4>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                {{ form|crispy }}
+                
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary-bu py-2 fs-5">Submit Subscription Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

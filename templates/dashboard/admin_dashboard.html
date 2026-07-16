@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | BU-MARKET{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-4 bg-primary-bu text-white rounded-3">
+            <h2 class="fw-bold mb-1">Admin Portal Summary</h2>
+            <p class="mb-0">Overview of BU-MARKET platform statistics. Access Django admin for full database configuration.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Metrics Cards -->
+<div class="row g-4 mb-4">
+    <!-- Total Listings -->
+    <div class="col-6 col-lg-4">
+        <div class="card border-0 shadow-sm p-4 h-100 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-muted fw-bold">Total Listings</span>
+                <i class="bi bi-shop text-primary-bu fs-2"></i>
+            </div>
+            <h2 class="fw-bold mb-0">{{ total_listings }}</h2>
+        </div>
+    </div>
+
+    <!-- Active Listings -->
+    <div class="col-6 col-lg-4">
+        <div class="card border-0 shadow-sm p-4 h-100 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-muted fw-bold">Active Listings</span>
+                <i class="bi bi-check-circle-fill text-success fs-2"></i>
+            </div>
+            <h2 class="fw-bold mb-0">{{ active_listings }}</h2>
+        </div>
+    </div>
+
+    <!-- Pending Moderation -->
+    <div class="col-6 col-lg-4">
+        <div class="card border-0 shadow-sm p-4 h-100 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-muted fw-bold">Pending Review</span>
+                <i class="bi bi-clock-history text-warning fs-2"></i>
+            </div>
+            <h2 class="fw-bold mb-0">{{ pending_listings }}</h2>
+        </div>
+    </div>
+
+    <!-- Total Sellers -->
+    <div class="col-6 col-lg-4">
+        <div class="card border-0 shadow-sm p-4 h-100 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-muted fw-bold">Total Sellers</span>
+                <i class="bi bi-people-fill text-info fs-2"></i>
+            </div>
+            <h2 class="fw-bold mb-0">{{ total_sellers }}</h2>
+        </div>
+    </div>
+
+    <!-- Active Subscriptions -->
+    <div class="col-6 col-lg-4">
+        <div class="card border-0 shadow-sm p-4 h-100 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-muted fw-bold">Active Plans</span>
+                <i class="bi bi-patch-check-fill text-primary fs-2"></i>
+            </div>
+            <h2 class="fw-bold mb-0">{{ active_subscriptions }}</h2>
+        </div>
+    </div>
+
+    <!-- Pending Payments -->
+    <div class="col-6 col-lg-4">
+        <div class="card border-0 shadow-sm p-4 h-100 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-muted fw-bold">Pending Payments</span>
+                <i class="bi bi-credit-card-2-front text-danger fs-2"></i>
+            </div>
+            <h2 class="fw-bold mb-0">{{ pending_payments }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm p-4 mb-4 text-center">
+    <h5 class="fw-bold mb-3">Administrative Controls</h5>
+    <p class="text-muted">For advanced controls, creating new categories, resolving support requests, and accessing audit logs, please use the secure Django Administration Portal.</p>
+    <div class="d-flex justify-content-center gap-2 mt-2">
+        <a href="/admin/" class="btn btn-primary-bu px-4 py-2" target="_blank">
+            <i class="bi bi-sliders me-2"></i> Open Django Admin Console
+        </a>
+    </div>
+</div>
+{% endblock %}

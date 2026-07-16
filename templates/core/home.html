@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Home | BU-MARKET{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="p-5 mb-4 bg-primary-bu text-white rounded-3 position-relative overflow-hidden" style="background: linear-gradient(135deg, #003B8E 0%, #001f4d 100%);">
+    <div class="row align-items-center py-3">
+        <div class="col-lg-8">
+            <h1 class="display-4 fw-bold">Welcome to <span class="text-accent-bu">BU-MARKET</span></h1>
+            <p class="col-md-10 fs-5">The ultimate mobile-first community marketplace for Bugema University students, staff, and campus sellers. Buy, sell, and find hostel items, textbooks, electronics, and jobs!</p>
+            <div class="d-flex gap-2 flex-wrap mt-4">
+                <a href="{% url 'core:browse' %}" class="btn btn-accent-bu btn-lg px-4 me-md-2">Browse All Listings</a>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-lg px-4">Start Selling</a>
+                {% elif user.is_seller %}
+                    <a href="{% url 'dashboard:create_listing' %}" class="btn btn-accent-bu btn-lg px-4">Post a Listing</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-4 d-none d-lg-block text-end">
+            <i class="bi bi-shop-window text-accent-bu" style="font-size: 10rem; opacity: 0.8;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Categories Section -->
+<div class="my-5">
+    <h3 class="fw-bold mb-4 d-flex align-items-center">
+        <i class="bi bi-grid-fill text-primary-bu me-2"></i> Browse Categories
+    </h3>
+    <div class="row g-2 g-md-3 row-cols-3 row-cols-md-6 justify-content-center">
+        {% for category in categories %}
+            <div class="col">
+                <a href="{% url 'core:browse' %}?category={{ category.slug }}" class="card text-center p-3 h-100 text-decoration-none border-0 shadow-sm transition" style="transition: transform 0.2s;">
+                    <div class="card-body p-0 d-flex flex-column align-items-center justify-content-center">
+                        <div class="rounded-circle bg-light p-3 mb-2 d-flex align-items-center justify-content-center text-primary-bu" style="width: 55px; height: 55px;">
+                            <i class="bi {{ category.icon }} fs-3"></i>
+                        </div>
+                        <span class="text-dark small fw-semibold text-truncate w-100">{{ category.name }}</span>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Promoted Listings -->
+{% if promoted_listings %}
+<div class="my-5">
+    <h3 class="fw-bold mb-4 d-flex align-items-center">
+        <i class="bi bi-star-fill text-accent-bu me-2"></i> Promoted Advertisements
+    </h3>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {% for listing in promoted_listings %}
+            <div class="col">
+                <div class="card h-100 listing-card border-0 position-relative">
+                    <!-- Promoted Badge -->
+                    <span class="position-absolute top-0 end-0 bg-accent-bu text-dark px-3 py-1 rounded-bl fw-bold shadow-sm small" style="border-bottom-left-radius: 12px; border-top-right-radius: 12px; z-index: 10;">
+                        <i class="bi bi-lightning-fill"></i> PROMOTED
+                    </span>
+                    
+                    {% if listing.image %}
+                        <img src="{{ listing.image.url }}" class="card-img-top" alt="{{ listing.title }}" style="height: 180px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-secondary text-white text-center py-5" style="height: 180px;">No Image</div>
+                    {% endif %}
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary-bu">{{ listing.category.name }}</span>
+                            <span class="badge text-uppercase bg-light text-dark border">{{ listing.get_condition_display }}</span>
+                        </div>
+                        <h5 class="card-title fw-bold text-truncate mb-1">{{ listing.title }}</h5>
+                        <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger"></i> {{ listing.location }}</p>
+                        
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <span class="text-primary-bu fw-bold fs-5">{{ listing.price }} UGX</span>
+                            <a href="{% url 'core:listing_detail' listing.slug %}" class="btn btn-primary-bu btn-sm px-3">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Recent Listings -->
+<div class="my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0 d-flex align-items-center">
+            <i class="bi bi-clock-history text-primary-bu me-2"></i> Recent Listings
+        </h3>
+        <a href="{% url 'core:browse' %}" class="text-primary-bu fw-semibold text-decoration-none">View All <i class="bi bi-arrow-right"></i></a>
+    </div>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {% for listing in listings %}
+            {% if not listing.is_promoted %}
+            <div class="col">
+                <div class="card h-100 listing-card border-0">
+                    {% if listing.image %}
+                        <img src="{{ listing.image.url }}" class="card-img-top" alt="{{ listing.title }}" style="height: 180px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-secondary text-white text-center py-5" style="height: 180px;">No Image</div>
+                    {% endif %}
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-light text-dark border">{{ listing.category.name }}</span>
+                            <span class="badge text-uppercase bg-light text-dark border">{{ listing.get_condition_display }}</span>
+                        </div>
+                        <h5 class="card-title fw-bold text-truncate mb-1">{{ listing.title }}</h5>
+                        <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger"></i> {{ listing.location }}</p>
+                        
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <span class="text-primary-bu fw-bold fs-5">{{ listing.price }} UGX</span>
+                            <a href="{% url 'core:listing_detail' listing.slug %}" class="btn btn-outline-primary-bu btn-sm px-3">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-basket text-muted display-4"></i>
+                <p class="mt-3 text-muted">No active listings available. Be the first to sell!</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

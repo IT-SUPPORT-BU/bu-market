@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register | BU-MARKET{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-0 shadow-sm p-4 rounded-3">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-plus-fill text-primary-bu display-3 mb-2"></i>
+                <h2 class="fw-bold">Join BU-MARKET</h2>
+                <p class="text-muted">Create a student or seller account in minutes</p>
+            </div>
+            
+            <form method="post" action="{% url 'accounts:register' %}">
+                {% csrf_token %}
+                
+                {{ form|crispy }}
+                
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary-bu py-2 fs-5">Register Account</button>
+                </div>
+            </form>
+            
+            <hr class="my-4">
+            
+            <div class="text-center">
+                <p class="mb-0 text-muted">Already registered?</p>
+                <a href="{% url 'accounts:login' %}" class="text-primary-bu fw-bold text-decoration-none">Sign In Here</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

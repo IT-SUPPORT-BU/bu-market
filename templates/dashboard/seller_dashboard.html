@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Seller Portal | BU-MARKET{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-4 bg-primary-bu text-white rounded-3">
+            <h2 class="fw-bold mb-1">Seller Portal</h2>
+            <p class="mb-0">Manage your campus shop, subscription, and list new products.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Active Subscription Details -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm p-4 mb-4 h-100">
+            <h4 class="fw-bold mb-4"><i class="bi bi-award text-primary-bu me-2"></i> Subscription Status</h4>
+            
+            {% if active_sub %}
+                <div class="text-center p-3 bg-light rounded mb-3">
+                    <span class="text-muted d-block small text-uppercase">Current Plan</span>
+                    <h3 class="fw-bold text-primary-bu my-1">{{ active_sub.plan.name }}</h3>
+                    
+                    {% if active_sub.plan.badge != 'none' %}
+                        <span class="badge text-uppercase {% if active_sub.plan.badge == 'SILVER' %}badge-silver{% elif active_sub.plan.badge == 'GOLD' %}badge-gold{% endif %} px-3 py-1">
+                            <i class="bi bi-patch-check-fill"></i> {{ active_sub.plan.badge }} Badge
+                        </span>
+                    {% endif %}
+                </div>
+                
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-2 d-flex justify-content-between">
+                        <span class="text-muted">Listing Limit:</span>
+                        <strong>{{ active_sub.plan.max_active_listings }} Active Listings</strong>
+                    </li>
+                    <li class="mb-2 d-flex justify-content-between">
+                        <span class="text-muted">Promoted Ads:</span>
+                        <strong>{% if active_sub.plan.has_promoted_ads %}Enabled{% else %}Disabled{% endif %}</strong>
+                    </li>
+                    <li class="mb-0 d-flex justify-content-between">
+                        <span class="text-muted">Expires On:</span>
+                        <strong>{{ active_sub.expires_at|date:"M d, Y" }}</strong>
+                    </li>
+                </ul>
+                
+                <div class="d-grid">
+                    <a href="{% url 'subscriptions:apply_seller' %}" class="btn btn-outline-primary-bu">Renew / Upgrade Plan</a>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-danger mb-3">
+                    <i class="bi bi-x-circle display-3 mb-2"></i>
+                    <h5 class="fw-bold">No Active Plan</h5>
+                    <p class="text-muted small">You cannot post new listings or reactivate old ones until you apply and get approved.</p>
+                </div>
+                
+                <div class="d-grid">
+                    <a href="{% url 'subscriptions:apply_seller' %}" class="btn btn-accent-bu py-2">Apply for Subscription Plan</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Short Cuts & Listings Stats -->
+    <div class="col-md-8 mb-4">
+        <div class="card border-0 shadow-sm p-4 mb-4">
+            <h4 class="fw-bold mb-4"><i class="bi bi-shop text-primary-bu me-2"></i> Listing Summary</h4>
+            
+            <div class="row text-center g-3 mb-4">
+                <div class="col-4">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">Total Listings</small>
+                        <span class="fw-bold fs-3">{{ listings.count }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">Active</small>
+                        <span class="fw-bold fs-3 text-success">
+                            {{ listings|dictsortreversed:"status"|length }}
+                            {# Custom count in templates is simpler via dynamic looping #}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">Store Views</small>
+                        <span class="fw-bold fs-3 text-info">
+                            {% temp_view_counter %}{# placeholder #}
+                            {% block val %}{% endblock %}
+                            {{ listings|regroup:"views_count"|length }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2 flex-wrap mb-4">
+                <a href="{% url 'dashboard:seller_listings' %}" class="btn btn-primary-bu px-4">
+                    <i class="bi bi-list-task me-2"></i> View My Listings
+                </a>
+                {% if active_sub %}
+                    <a href="{% url 'dashboard:create_listing' %}" class="btn btn-accent-bu px-4">
+                        <i class="bi bi-plus-circle me-2"></i> Post New Listing
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Application History -->
+        <div class="card border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-4"><i class="bi bi-credit-card text-primary-bu me-2"></i> Subscription History</h4>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Plan</th>
+                            <th>Reference</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sub in history %}
+                            <tr>
+                                <td class="fw-bold">{{ sub.plan.name }}</td>
+                                <td><code>{{ sub.payment_reference }}</code></td>
+                                <td>{{ sub.amount_paid }} UGX</td>
+                                <td>{{ sub.submitted_at|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if sub.status == 'PENDING' %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif sub.status == 'APPROVED' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">No subscription history.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

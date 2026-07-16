@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}My Listings | BU-MARKET{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">My Products</h2>
+    <div class="d-flex gap-2">
+        <a href="{% url 'dashboard:home' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-chevron-left"></i> Dashboard
+        </a>
+        <a href="{% url 'dashboard:create_listing' %}" class="btn btn-accent-bu">
+            <i class="bi bi-plus-circle"></i> Add Product
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm p-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Views</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for listing in listings %}
+                    <tr>
+                        <td style="width: 80px;">
+                            {% if listing.image %}
+                                <img src="{{ listing.image.url }}" class="img-thumbnail" alt="{{ listing.title }}" style="width: 60px; height: 60px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-secondary text-white text-center rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">No Pic</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <h6 class="fw-bold mb-0">{{ listing.title }}</h6>
+                            <small class="text-muted">Condition: {{ listing.get_condition_display }}</small>
+                            {% if listing.is_promoted %}
+                                <span class="badge bg-accent-bu text-dark ms-1 small"><i class="bi bi-lightning-fill"></i> Promoted</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ listing.category.name }}</td>
+                        <td class="fw-bold text-primary-bu">{{ listing.price }} UGX</td>
+                        <td>
+                            {% if listing.status == 'PENDING' %}
+                                <span class="badge bg-warning text-dark">Pending Review</span>
+                            {% elif listing.status == 'ACTIVE' %}
+                                <span class="badge bg-success">Active / Live</span>
+                            {% elif listing.status == 'SOLD' %}
+                                <span class="badge bg-info">Sold</span>
+                            {% else %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ listing.views_count }}</td>
+                        <td class="text-end">
+                            <div class="btn-group">
+                                <a href="{% url 'core:listing_detail' listing.slug %}" class="btn btn-sm btn-outline-secondary" title="View Detail">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'dashboard:edit_listing' listing.slug %}" class="btn btn-sm btn-outline-primary" title="Edit Listing">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-box2 display-4 d-block mb-3 text-muted"></i>
+                            You haven't uploaded any products yet.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

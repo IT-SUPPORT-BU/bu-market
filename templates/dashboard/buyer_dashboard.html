@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Buyer Dashboard | BU-MARKET{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-4 bg-primary-bu text-white rounded-3">
+            <h2 class="fw-bold mb-1">Buyer Dashboard</h2>
+            <p class="mb-0">Track your verification state and account settings.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-0 shadow-sm p-4 text-center">
+            <h4 class="fw-bold mb-4">Verification Status</h4>
+            
+            {% if membership %}
+                <div class="p-4 bg-light rounded-3 mb-4">
+                    <span class="text-muted d-block small text-uppercase">Membership State</span>
+                    
+                    {% if membership.status == 'PENDING' %}
+                        <h2 class="fw-bold text-warning my-2"><i class="bi bi-clock-history"></i> PENDING</h2>
+                        <p class="text-muted mb-0 small">An accountant is currently reviewing your payment reference of {{ membership.amount_paid }} UGX.</p>
+                    {% elif membership.status == 'ACTIVE' %}
+                        <h2 class="fw-bold text-success my-2"><i class="bi bi-check-circle-fill"></i> ACTIVE MEMBER</h2>
+                        <p class="text-muted mb-0 small">Thank you! Your buyer membership is verified and active.</p>
+                    {% else %}
+                        <h2 class="fw-bold text-danger my-2"><i class="bi bi-exclamation-triangle-fill"></i> EXPIRED</h2>
+                        <p class="text-muted mb-3 small">Your membership has expired or was rejected by the accountant.</p>
+                        <a href="{% url 'subscriptions:apply_buyer' %}" class="btn btn-primary-bu px-4">Re-apply Membership</a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="p-4 bg-light rounded-3 mb-4 text-center">
+                    <i class="bi bi-shield-lock display-3 text-muted mb-3"></i>
+                    <h5 class="fw-bold text-danger">Unverified Buyer</h5>
+                    <p class="text-muted small mb-4">Verification unlocks direct seller phone access and places a trust badge next to your profile in communications.</p>
+                    <a href="{% url 'subscriptions:apply_buyer' %}" class="btn btn-accent-bu px-4">Verify Membership</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login | BU-MARKET{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-sm p-4 rounded-3">
+            <div class="text-center mb-4">
+                <i class="bi bi-shop text-primary-bu display-3 mb-2"></i>
+                <h2 class="fw-bold">Sign In to BU-MARKET</h2>
+                <p class="text-muted">Enter your campus credentials to continue</p>
+            </div>
+            
+            <form method="post" action="{% url 'accounts:login' %}">
+                {% csrf_token %}
+                
+                {{ form|crispy }}
+                
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary-bu py-2 fs-5">Sign In</button>
+                </div>
+            </form>
+            
+            <hr class="my-4">
+            
+            <div class="text-center">
+                <p class="mb-0 text-muted">Don't have an account yet?</p>
+                <a href="{% url 'accounts:register' %}" class="text-primary-bu fw-bold text-decoration-none">Create a Campus Account</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

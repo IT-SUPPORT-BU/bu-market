@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Moderator Dashboard | BU-MARKET{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-4 bg-primary-bu text-white rounded-3">
+            <h2 class="fw-bold mb-1">Moderator Portal</h2>
+            <p class="mb-0">Review newly posted listings to ensure they comply with university guidelines before publishing.</p>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm p-4">
+    <h4 class="fw-bold mb-4 d-flex align-items-center">
+        <i class="bi bi-shield-check text-primary-bu me-2"></i> Listings Pending Approval
+    </h4>
+    
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Product Image</th>
+                    <th>Listing details</th>
+                    <th>Seller</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th class="text-end">Moderation Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for listing in pending_listings %}
+                    <tr>
+                        <td style="width: 100px;">
+                            {% if listing.image %}
+                                <img src="{{ listing.image.url }}" class="img-thumbnail" alt="{{ listing.title }}" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-secondary text-white text-center rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">No Pic</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <h6 class="fw-bold mb-1">{{ listing.title }}</h6>
+                            <p class="mb-1 text-muted small text-truncate" style="max-width: 250px;">{{ listing.description }}</p>
+                            <span class="badge bg-light text-dark border text-uppercase small">{{ listing.get_condition_display }}</span>
+                        </td>
+                        <td>{{ listing.seller.username }}</td>
+                        <td>{{ listing.category.name }}</td>
+                        <td class="fw-bold text-primary-bu">{{ listing.price }} UGX</td>
+                        <td class="text-end">
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a href="{% url 'core:listing_detail' listing.slug %}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                    <i class="bi bi-eye"></i> Details
+                                </a>
+                                <a href="{% url 'moderation:approve_listing' listing.pk %}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-circle"></i> Approve
+                                </a>
+                                <a href="{% url 'moderation:reject_listing' listing.pk %}" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-x-circle"></i> Reject
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-check-circle-fill text-success display-4 d-block mb-3"></i>
+                            Excellent! No listings currently waiting for moderation.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

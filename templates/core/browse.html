@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Listings | BU-MARKET{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar Filters (Desktop only, or toggleable on mobile) -->
+    <div class="col-lg-3 mb-4">
+        <div class="card border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-4 d-flex align-items-center">
+                <i class="bi bi-funnel text-primary-bu me-2"></i> Filters
+            </h4>
+            
+            <form action="{% url 'core:browse' %}" method="get">
+                <!-- Keyword search -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Search Keywords</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="q" class="form-control border-start-0" placeholder="What are you looking for?" value="{{ request.GET.q }}">
+                    </div>
+                </div>
+                
+                <!-- Category filter -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Category</label>
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Price Range filter -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Price (UGX)</label>
+                    <div class="row g-2">
+                        <div class="col">
+                            <input type="number" name="min_price" class="form-control" placeholder="Min" value="{{ request.GET.min_price }}">
+                        </div>
+                        <div class="col">
+                            <input type="number" name="max_price" class="form-control" placeholder="Max" value="{{ request.GET.max_price }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Condition filter -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Condition</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="condition" id="cond_any" value="" {% if not request.GET.condition %}checked{% endif %}>
+                        <label class="form-check-label" for="cond_any">Any Condition</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="condition" id="cond_new" value="NEW" {% if request.GET.condition == 'NEW' %}checked{% endif %}>
+                        <label class="form-check-label" for="cond_new">New</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="condition" id="cond_used" value="USED" {% if request.GET.condition == 'USED' %}checked{% endif %}>
+                        <label class="form-check-label" for="cond_used">Used</label>
+                    </div>
+                </div>
+                
+                <!-- Submit and Clear -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary-bu py-2">Apply Filters</button>
+                    <a href="{% url 'core:browse' %}" class="btn btn-light py-2">Clear Filters</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Listings Grid -->
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0">Browse Marketplace</h3>
+            <span class="text-muted">{{ page_obj.paginator.count }} item(s) found</span>
+        </div>
+        
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for listing in listings %}
+                <div class="col">
+                    <div class="card h-100 listing-card border-0 position-relative">
+                        {% if listing.is_promoted %}
+                            <span class="position-absolute top-0 end-0 bg-accent-bu text-dark px-3 py-1 rounded-bl fw-bold shadow-sm small" style="border-bottom-left-radius: 12px; border-top-right-radius: 12px; z-index: 10;">
+                                <i class="bi bi-lightning-fill"></i> PROMOTED
+                            </span>
+                        {% endif %}
+                        
+                        {% if listing.image %}
+                            <img src="{{ listing.image.url }}" class="card-img-top" alt="{{ listing.title }}" style="height: 180px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-secondary text-white text-center py-5" style="height: 180px;">No Image</div>
+                        {% endif %}
+                        
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge {% if listing.is_promoted %}bg-primary-bu{% else %}bg-light text-dark border{% endif %}">{{ listing.category.name }}</span>
+                                <span class="badge text-uppercase bg-light text-dark border">{{ listing.get_condition_display }}</span>
+                            </div>
+                            
+                            <h5 class="card-title fw-bold text-truncate mb-1">{{ listing.title }}</h5>
+                            <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger"></i> {{ listing.location }}</p>
+                            
+                            <div class="mt-auto d-flex justify-content-between align-items-center">
+                                <span class="text-primary-bu fw-bold fs-5">{{ listing.price }} UGX</span>
+                                <a href="{% url 'core:listing_detail' listing.slug %}" class="btn {% if listing.is_promoted %}btn-primary-bu{% else %}btn-outline-primary-bu{% endif %} btn-sm px-3">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5 bg-white rounded-3 shadow-sm">
+                    <i class="bi bi-search display-1 text-muted"></i>
+                    <h4 class="fw-bold mt-3">No matching items found</h4>
+                    <p class="text-muted">Try adjusting your filters or search keywords.</p>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <nav class="my-5 d-flex justify-content-center">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{{ query_string }}&page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link bg-primary-bu border-primary-bu">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link text-primary-bu" href="?{{ query_string }}&page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{{ query_string }}&page={{ page_obj.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
