@@ -45,3 +45,130 @@ class UserRoleTestCase(TestCase):
         self.assertFalse(admin.is_moderator)
         self.assertTrue(admin.is_admin_role)
 
+
+from django.urls import reverse
+
+class UserRoleAccessControlTestCase(TestCase):
+    def setUp(self):
+        self.password = 'password123'
+        self.buyer = User.objects.create_user(username='buyer', password=self.password, role=User.Role.BUYER)
+        self.seller = User.objects.create_user(username='seller', password=self.password, role=User.Role.SELLER)
+        self.accountant = User.objects.create_user(username='accountant', password=self.password, role=User.Role.ACCOUNTANT)
+        self.moderator = User.objects.create_user(username='moderator', password=self.password, role=User.Role.MODERATOR)
+        self.admin = User.objects.create_user(username='admin_role', password=self.password, role=User.Role.ADMIN)
+        self.superuser = User.objects.create_superuser(username='super', password=self.password)
+
+    def test_anonymous_user_redirects(self):
+        urls = [
+            reverse('dashboard:seller_dashboard'),
+            reverse('dashboard:buyer_dashboard'),
+            reverse('dashboard:accountant_dashboard'),
+            reverse('dashboard:moderator_dashboard'),
+            reverse('dashboard:admin_dashboard'),
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 302)
+            self.assertIn(reverse('accounts:login'), response.url)
+
+    def test_seller_dashboard_access(self):
+        url = reverse('dashboard:seller_dashboard')
+        # Seller should access
+        self.client.login(username='seller', password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.client.logout()
+
+        # Others should be denied (403)
+        for username in ['buyer', 'accountant', 'moderator', 'admin_role']:
+            self.client.login(username=username, password=self.password)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 403)
+            self.client.logout()
+
+        # Superuser should access
+        self.client.login(username='super', password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_buyer_dashboard_access(self):
+        url = reverse('dashboard:buyer_dashboard')
+        # Buyer should access
+        self.client.login(username='buyer', password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.client.logout()
+
+        # Others should be denied (403)
+        for username in ['seller', 'accountant', 'moderator', 'admin_role']:
+            self.client.login(username=username, password=self.password)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 403)
+            self.client.logout()
+
+        # Superuser should access
+        self.client.login(username='super', password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_accountant_dashboard_access(self):
+        url = reverse('dashboard:accountant_dashboard')
+        # Accountant should access
+        self.client.login(username='accountant', password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.client.logout()
+
+        # Others should be denied (403)
+        for username in ['buyer', 'seller', 'moderator', 'admin_role']:
+            self.client.login(username=username, password=self.password)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 403)
+            self.client.logout()
+
+        # Superuser should access
+        self.client.login(username='super', password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_moderator_dashboard_access(self):
+        url = reverse('dashboard:moderator_dashboard')
+        # Moderator should access
+        self.client.login(username='moderator', password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.client.logout()
+
+        # Others should be denied (403)
+        for username in ['buyer', 'seller', 'accountant', 'admin_role']:
+            self.client.login(username=username, password=self.password)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 403)
+            self.client.logout()
+
+        # Superuser should access
+        self.client.login(username='super', password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_admin_dashboard_access(self):
+        url = reverse('dashboard:admin_dashboard')
+        # Admin should access
+        self.client.login(username='admin_role', password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.client.logout()
+
+        # Others should be denied (403)
+        for username in ['buyer', 'seller', 'accountant', 'moderator']:
+            self.client.login(username=username, password=self.password)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 403)
+            self.client.logout()
+
+        # Superuser should access
+        self.client.login(username='super', password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+
