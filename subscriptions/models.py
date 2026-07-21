@@ -87,6 +87,7 @@ class BuyerMembership(models.Model):
         upload_to='receipts/buyer/',
         validators=[validate_file_size]
     )
+    payment_reference = models.CharField(max_length=100, unique=True)
     status = models.CharField(
         max_length=15,
         choices=Status.choices,
