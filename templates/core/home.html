@@ -23,7 +23,19 @@
         </div>
     </div>
 </div>
-
+{% if user.is_authenticated and recently_viewed_listings %}
+<div class="card mb-4">
+  <div class="card-header bg-primary-bu text-white">Recently Viewed</div>
+  <div class="list-group list-group-flush">
+    {% for listing in recently_viewed_listings %}
+      <a href="{% url 'core:listing_detail' listing.slug %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <span>{{ listing.title }}</span>
+        <small class="text-muted">{{ listing.price }} UGX</small>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
 <!-- Categories Section -->
 <div class="my-5">
     <h3 class="fw-bold mb-4 d-flex align-items-center">
@@ -34,9 +46,13 @@
             <div class="col">
                 <a href="{% url 'core:browse' %}?category={{ category.slug }}" class="card text-center p-3 h-100 text-decoration-none border-0 shadow-sm transition" style="transition: transform 0.2s;">
                     <div class="card-body p-0 d-flex flex-column align-items-center justify-content-center">
-                        <div class="rounded-circle bg-light p-3 mb-2 d-flex align-items-center justify-content-center text-primary-bu" style="width: 55px; height: 55px;">
-                            <i class="bi {{ category.icon }} fs-3"></i>
-                        </div>
+                        <div class="rounded-circle overflow-hidden mx-auto" style="width:60px;height:60px;">
+  {% if category.image %}
+    <img src="{{ category.image.url }}" alt="{{ category.name }}" style="width:100%;height:100%;object-fit:cover;">
+  {% else %}
+    <div class="bg-light w-100 h-100"></div>
+  {% endif %}
+</div>
                         <span class="text-dark small fw-semibold text-truncate w-100">{{ category.name }}</span>
                     </div>
                 </a>

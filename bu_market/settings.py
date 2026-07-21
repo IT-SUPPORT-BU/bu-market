@@ -41,12 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Third party apps
     'rest_framework',
     'crispy_forms',
     'crispy_bootstrap5',
-    
+
     # Project apps
     'accounts.apps.AccountsConfig',
     'marketplace.apps.MarketplaceConfig',
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'moderation.apps.ModerationConfig',
     'dashboard.apps.DashboardConfig',
     'core.apps.CoreConfig',
+    'messaging.apps.MessagingConfig',
 ]
 
 MIDDLEWARE = [
@@ -81,6 +82,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.recently_viewed',
             ],
         },
     },
