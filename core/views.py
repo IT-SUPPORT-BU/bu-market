@@ -31,36 +31,49 @@ class BrowseView(ListView):
 
     def get_queryset(self):
         queryset = Listing.objects.filter(status=Listing.Status.ACTIVE)
-        
+
         # Apply filters
         q = self.request.GET.get('q')
         if q:
             queryset = queryset.filter(Q(title__icontains=q) | Q(description__icontains=q))
-            
+
         category_slug = self.request.GET.get('category')
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
-            
+
+        location = self.request.GET.get('location')
+        if location:
+            queryset = queryset.filter(location__icontains=location)
+
         min_price = self.request.GET.get('min_price')
         if min_price:
             try:
                 queryset = queryset.filter(price__gte=float(min_price))
             except ValueError:
                 pass
-                
+
         max_price = self.request.GET.get('max_price')
         if max_price:
             try:
                 queryset = queryset.filter(price__lte=float(max_price))
             except ValueError:
                 pass
-                
+
         condition = self.request.GET.get('condition')
         if condition in [Listing.Condition.NEW, Listing.Condition.USED]:
             queryset = queryset.filter(condition=condition)
 
-        # Ordering: Promoted-first, newest-first
-        return queryset.order_by('-is_promoted', '-created_at')
+        sort_option = self.request.GET.get('sort', '')
+        if sort_option == 'price_asc':
+            ordering = ['-is_promoted', 'price', '-created_at']
+        elif sort_option == 'price_desc':
+            ordering = ['-is_promoted', '-price', '-created_at']
+        elif sort_option == 'oldest':
+            ordering = ['-is_promoted', 'created_at']
+        else:
+            ordering = ['-is_promoted', '-created_at']
+
+        return queryset.order_by(*ordering)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -8,4 +8,4 @@ media/
 .idea/
 *.log
 docs/intern_teaching_guide.md
-
+venv/

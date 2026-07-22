@@ -32,6 +32,12 @@
                     </select>
                 </div>
                 
+                <!-- Location filter -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Location</label>
+                    <input type="text" name="location" class="form-control" placeholder="e.g. Kampala Road" value="{{ request.GET.location }}">
+                </div>
+
                 <!-- Price Range filter -->
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Price (UGX)</label>
@@ -43,6 +49,17 @@
                             <input type="number" name="max_price" class="form-control" placeholder="Max" value="{{ request.GET.max_price }}">
                         </div>
                     </div>
+                </div>
+
+                <!-- Sort order -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Sort By</label>
+                    <select name="sort" class="form-select">
+                        <option value="" {% if not request.GET.sort %}selected{% endif %}>Newest First</option>
+                        <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="oldest" {% if request.GET.sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    </select>
                 </div>
                 
                 <!-- Condition filter -->
