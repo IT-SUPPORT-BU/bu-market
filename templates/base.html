@@ -177,7 +177,7 @@
             color: white;
         }
     </style>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.0.2">
     {% block extra_css %}{% endblock %}
 </head>
 
@@ -267,11 +267,104 @@
         {% endblock %}
     </main>
 
-    <!-- Desktop Footer (Hidden on mobile for cleaner app look) -->
-    <footer class="py-4 text-center d-none d-md-block">
+    <!-- Desktop Footer (Visible on large screens) -->
+    <footer class="desktop-footer py-5 d-none d-md-block">
         <div class="container">
-            <p class="mb-1">&copy; 2026 BU-MARKET. Designed for Bugema University Community.</p>
-            <small class="text-muted">A Mobile-First Web Application.</small>
+            <div class="row g-4">
+                <!-- Column 1: Brand -->
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5 class="text-white fw-bold d-flex align-items-center mb-3">
+                        <i class="bi bi-shop text-accent-bu me-2"></i>BU-MARKET
+                    </h5>
+                    <p class="text-white-50 small mb-3">
+                        The ultimate student-led community marketplace for Bugema University. Buy, sell, and connect commission-free.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="footer-social-icon"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="footer-social-icon"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="footer-social-icon"><i class="bi bi-whatsapp"></i></a>
+                        <a href="mailto:support@bumarket.com" class="footer-social-icon"><i class="bi bi-envelope-fill"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Column 2: Quick Links -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h6 class="mb-3">Quick Links</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="{% url 'core:home' %}">Home</a></li>
+                        <li class="mb-2"><a href="{% url 'core:browse' %}">Browse Listings</a></li>
+                        <li class="mb-2"><a href="{% url 'accounts:register' %}">Start Selling</a></li>
+                        <li class="mb-2"><a href="{% url 'subscriptions:apply_buyer' %}">Buyer Membership</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3: Categories -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h6 class="mb-3">Categories</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=hostel-items">Hostel Items</a></li>
+                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=textbooks">Textbooks</a></li>
+                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=electronics">Electronics</a></li>
+                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=phones">Smartphones</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 4: Contact / Help -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <h6 class="mb-3">Technical Support</h6>
+                    <p class="small text-white-50 mb-2">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> Bugema University Campus, Kampala, Uganda
+                    </p>
+                    <p class="small text-white-50 mb-3">
+                        <i class="bi bi-patch-check-fill text-accent-bu me-1"></i> <strong>Excellence in Market</strong>
+                    </p>
+                    <div class="p-3 rounded bg-white bg-opacity-5 border border-white border-opacity-10">
+                        <span class="d-block small text-white-50">Need assistance? Contact portal admin:</span>
+                        <a href="mailto:support@bumarket.com" class="fw-bold text-accent-bu small">support@bumarket.com</a>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-4 border-white border-opacity-10">
+            
+            <div class="row align-items-center text-white-50">
+                <div class="col-md-6 text-center text-md-start small">
+                    &copy; 2026 BU-MARKET. Designed for Bugema University Community.<br>
+                    <span class="text-white-50 opacity-75" style="font-size: 0.8rem;">Developed by IT-Support in conjunction with the Inter students of 2026</span>
+                </div>
+                <div class="col-md-6 text-center text-md-end small mt-2 mt-md-0">
+                    <a href="#" class="me-3">Terms of Use</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Footer (Visible only on mobile/tablet screens) -->
+    <footer class="mobile-footer py-4 px-3 d-md-none text-center">
+        <div class="container">
+            <h6 class="text-white fw-bold mb-2">
+                <i class="bi bi-shop text-accent-bu me-1"></i> BU-MARKET
+            </h6>
+            <p class="text-muted small mb-3">Excellence in Market</p>
+            
+            <div class="d-flex justify-content-center gap-2 mb-3">
+                <a href="#" class="footer-social-icon"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="footer-social-icon"><i class="bi bi-twitter-x"></i></a>
+                <a href="#" class="footer-social-icon"><i class="bi bi-whatsapp"></i></a>
+                <a href="mailto:support@bumarket.com" class="footer-social-icon"><i class="bi bi-envelope-fill"></i></a>
+            </div>
+            
+            <div class="d-flex justify-content-center gap-3 flex-wrap small mb-3 text-white-50">
+                <a href="{% url 'core:home' %}">Home</a>
+                <span>&bull;</span>
+                <a href="{% url 'core:browse' %}">Browse</a>
+                <span>&bull;</span>
+                <a href="mailto:support@bumarket.com">Support</a>
+            </div>
+            
+            <small class="text-muted d-block">&copy; 2026 BU-MARKET. Campus Edition.</small>
+            <small class="text-muted d-block mt-1 opacity-75" style="font-size: 0.72rem;">Developed by IT-Support in conjunction with the Inter students of 2026</small>
         </div>
     </footer>
 

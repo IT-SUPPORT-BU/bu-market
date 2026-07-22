@@ -3,45 +3,336 @@
 {% block title %}Home | BU-MARKET{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="p-5 mb-4 bg-primary-bu text-white rounded-3 position-relative overflow-hidden" style="background: linear-gradient(135deg, #003B8E 0%, #001f4d 100%);">
-    <div class="row align-items-center py-3">
-        <div class="col-lg-8">
-            <h1 class="display-4 fw-bold">Welcome to <span class="text-accent-bu">BU-MARKET</span></h1>
-            <p class="col-md-10 fs-5">The ultimate mobile-first community marketplace for Bugema University students, staff, and campus sellers. Buy, sell, and find hostel items, textbooks, electronics, and jobs!</p>
-            <div class="d-flex gap-2 flex-wrap mt-4">
-                <a href="{% url 'core:browse' %}" class="btn btn-accent-bu btn-lg px-4 me-md-2">Browse All Listings</a>
+<!-- Hero Section (Desktop/Tablet View) -->
+<div class="d-none d-md-block p-4 p-md-5 mb-5 text-white rounded-4 overflow-hidden hero-gradient shadow-lg">
+    <!-- Blurred Decorative Background Blobs -->
+    <div class="hero-bg-blobs">
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
+    </div>
+    
+    <div class="row align-items-center py-2 py-md-4 position-relative" style="z-index: 2;">
+        <div class="col-lg-7 text-center text-lg-start">
+            <!-- Excellence in Market Slogan Badge -->
+            <div class="slogan-badge mb-3 animate-pulse-glow">
+                <i class="bi bi-patch-check-fill text-accent-bu"></i>
+                <span class="fw-bold">Excellence in Market</span>
+            </div>
+            
+            <h1 class="display-4 fw-extrabold mb-3">
+                Welcome to <span class="text-accent-bu text-gradient-gold">BU-MARKET</span>
+            </h1>
+            
+            <p class="fs-5 text-white-50 mb-4 col-lg-11">
+                The ultimate mobile-first community marketplace for Bugema University. Buy, sell, and find hostel items, textbooks, electronics, and jobs with ease.
+            </p>
+            
+            <!-- Hero Search Form -->
+            <form action="{% url 'core:browse' %}" method="get" class="search-hero-form mx-auto mx-lg-0 mb-4">
+                <div class="d-flex align-items-center w-100">
+                    <i class="bi bi-search text-muted ms-3 fs-5"></i>
+                    <input type="text" name="q" class="form-control border-0 bg-transparent py-3 px-3 shadow-none text-dark" placeholder="What are you looking for today?" aria-label="Search">
+                    <button type="submit" class="btn btn-primary-bu rounded-pill px-4 py-2 me-1">
+                        <span class="d-none d-sm-inline">Search</span>
+                        <i class="bi bi-search d-inline d-sm-none"></i>
+                    </button>
+                </div>
+            </form>
+            
+            <div class="d-flex gap-3 flex-wrap justify-content-center justify-content-lg-start mt-4">
+                <a href="{% url 'core:browse' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill shadow-sm">
+                    <i class="bi bi-bag-fill me-2"></i>Browse Listings
+                </a>
                 {% if not user.is_authenticated %}
-                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-lg px-4">Start Selling</a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-lg px-4 py-2.5 rounded-pill">
+                        <i class="bi bi-shop me-2"></i>Start Selling
+                    </a>
                 {% elif user.is_seller %}
-                    <a href="{% url 'dashboard:create_listing' %}" class="btn btn-accent-bu btn-lg px-4">Post a Listing</a>
+                    <a href="{% url 'dashboard:create_listing' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill shadow-sm">
+                        <i class="bi bi-plus-circle-fill me-2"></i>Post a Listing
+                    </a>
                 {% endif %}
             </div>
         </div>
-        <div class="col-lg-4 d-none d-lg-block text-end">
-            <i class="bi bi-shop-window text-accent-bu" style="font-size: 10rem; opacity: 0.8;"></i>
+        
+        <!-- Animated Stat Graphics for Larger Screens -->
+        <div class="col-lg-5 d-none d-lg-block text-end mt-4 mt-lg-0">
+            <div class="row g-3 justify-content-end" style="max-width: 420px; margin-left: auto;">
+                <div class="col-6">
+                    <div class="hero-stat-card animate-float shadow">
+                        <i class="bi bi-shield-check text-accent-bu fs-3 mb-2 d-block"></i>
+                        <div class="fw-bold fs-5">100% Safe</div>
+                        <div class="small text-white-50">Campus Verified</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="hero-stat-card animate-float-reverse shadow" style="animation-delay: 1s;">
+                        <i class="bi bi-lightning-charge text-accent-bu fs-3 mb-2 d-block"></i>
+                        <div class="fw-bold fs-5">Fast Deals</div>
+                        <div class="small text-white-50">WhatsApp / Call</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="hero-stat-card animate-float shadow" style="animation-delay: 2s;">
+                        <div class="d-flex align-items-center justify-content-center gap-3">
+                            <div class="rounded-circle bg-white bg-opacity-10 p-2.5 d-flex align-items-center justify-content-center">
+                                <i class="bi bi-tag-fill text-accent-bu fs-3"></i>
+                            </div>
+                            <div class="text-start">
+                                <div class="fw-bold">0% Commission</div>
+                                <div class="small text-white-50">Keep all your profits locally</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Categories Section -->
-<div class="my-5">
-    <h3 class="fw-bold mb-4 d-flex align-items-center">
-        <i class="bi bi-grid-fill text-primary-bu me-2"></i> Browse Categories
-    </h3>
-    <div class="row g-2 g-md-3 row-cols-3 row-cols-md-6 justify-content-center">
-        {% for category in categories %}
-            <div class="col">
-                <a href="{% url 'core:browse' %}?category={{ category.slug }}" class="card text-center p-3 h-100 text-decoration-none border-0 shadow-sm transition" style="transition: transform 0.2s;">
-                    <div class="card-body p-0 d-flex flex-column align-items-center justify-content-center">
-                        <div class="rounded-circle bg-light p-3 mb-2 d-flex align-items-center justify-content-center text-primary-bu" style="width: 55px; height: 55px;">
-                            <i class="bi {{ category.icon }} fs-3"></i>
-                        </div>
-                        <span class="text-dark small fw-semibold text-truncate w-100">{{ category.name }}</span>
-                    </div>
-                </a>
+<!-- Hero Section (Mobile View - Compact & Action-Focused) -->
+<div class="d-block d-md-none mb-4 p-4 text-white rounded-4 hero-gradient overflow-hidden shadow position-relative text-center">
+    <!-- Blurred Decorative Background Blobs -->
+    <div class="hero-bg-blobs">
+        <div class="hero-blob hero-blob-1" style="width: 150px; height: 150px; right: -20px; top: -20px; opacity: 0.25;"></div>
+        <div class="hero-blob hero-blob-2" style="width: 150px; height: 150px; left: -20px; bottom: -20px; opacity: 0.25;"></div>
+    </div>
+    
+    <div class="position-relative" style="z-index: 2;">
+        <!-- Mobile Slogan Badge -->
+        <span class="badge bg-white bg-opacity-10 text-accent-bu border border-warning border-opacity-25 px-3 py-2 rounded-pill fw-semibold text-uppercase tracking-wider mb-2.5" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+            <i class="bi bi-patch-check-fill me-1 text-accent-bu"></i> Excellence in Market
+        </span>
+        
+        <!-- Mobile Title -->
+        <h1 class="fw-extrabold mb-2 text-white" style="font-size: 1.85rem; letter-spacing: -0.5px;">
+            BU-<span class="text-accent-bu">MARKET</span>
+        </h1>
+        
+        <!-- Compact Search Form -->
+        <form action="{% url 'core:browse' %}" method="get" class="mt-3 p-1 bg-white rounded-pill shadow-sm d-flex align-items-center justify-content-between mx-auto" style="max-width: 100%;">
+            <div class="d-flex align-items-center flex-grow-1 ps-2">
+                <i class="bi bi-search text-muted me-1"></i>
+                <input type="text" name="q" class="form-control border-0 bg-transparent py-2 px-1 shadow-none text-dark" placeholder="Search hostels, books, phones..." aria-label="Search" style="font-size: 0.9rem;">
             </div>
-        {% endfor %}
+            <button type="submit" class="btn btn-primary-bu rounded-pill px-3 py-1.5 fs-7">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+        
+        <!-- Quick Mobile Tag Filters (Infinite Scrolling Marquee with Category Icons) -->
+        <div class="marquee-wrapper mt-3">
+            <div class="marquee-content">
+                <!-- Group 1 -->
+                <div class="marquee-group">
+                    {% for category in categories %}
+                        <a href="{% url 'core:browse' %}?category={{ category.slug }}" class="btn btn-sm btn-light marquee-item border-0 text-white rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5">
+                            <i class="bi {{ category.icon }} text-accent-bu"></i>
+                            <span style="font-size: 0.75rem;">{{ category.name }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+                <!-- Group 2 (Duplicate for seamless loop scrolling) -->
+                <div class="marquee-group">
+                    {% for category in categories %}
+                        <a href="{% url 'core:browse' %}?category={{ category.slug }}" class="btn btn-sm btn-light marquee-item border-0 text-white rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5">
+                            <i class="bi {{ category.icon }} text-accent-bu"></i>
+                            <span style="font-size: 0.75rem;">{{ category.name }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Action Buttons -->
+        <div class="d-flex justify-content-center gap-2 mt-3.5">
+            <a href="{% url 'core:browse' %}" class="btn btn-accent-bu btn-sm px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                <i class="bi bi-grid-3x3-gap-fill me-1"></i> Browse All
+            </a>
+            {% if user.is_authenticated and user.is_seller %}
+                <a href="{% url 'dashboard:create_listing' %}" class="btn btn-outline-light btn-sm px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                    <i class="bi bi-plus-circle-fill me-1"></i> Post Ad
+                </a>
+            {% elif not user.is_authenticated %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-sm px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                    <i class="bi bi-person-plus-fill me-1"></i> Join Free
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Categories Section (Desktop/Tablet View Only) -->
+<div class="my-5 d-none d-md-block">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0 d-flex align-items-center">
+            <i class="bi bi-grid-fill text-primary-bu me-2"></i> Browse Categories
+        </h3>
+    </div>
+    
+    <div class="position-relative px-4 px-md-5">
+        <div id="categoryCarousel" class="carousel slide" data-bs-ride="false">
+            <div class="carousel-inner">
+                {% for category in categories %}
+                    {% if forloop.first %}
+                        <div class="carousel-item active">
+                            <div class="row g-2 g-md-3 row-cols-3 row-cols-lg-6 justify-content-center py-2">
+                    {% elif forloop.counter0|divisibleby:6 %}
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="row g-2 g-md-3 row-cols-3 row-cols-lg-6 justify-content-center py-2">
+                    {% endif %}
+                    
+                    <div class="col">
+                        <a href="{% url 'core:browse' %}?category={{ category.slug }}" class="card text-center p-2 p-md-3 h-100 text-decoration-none category-card">
+                            <div class="card-body p-0 d-flex flex-column align-items-center justify-content-center">
+                                <div class="category-icon-container mb-2 mb-md-3 shadow-sm">
+                                    <i class="bi {{ category.icon }} fs-4 fs-md-3"></i>
+                                </div>
+                                <span class="text-dark small fw-bold text-truncate w-100">{{ category.name }}</span>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    {% if forloop.last %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            {% if categories|length > 6 %}
+                <!-- Carousel Controls -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#categoryCarousel" data-bs-slide="prev" style="width: 5%; filter: invert(1); left: 0;">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#categoryCarousel" data-bs-slide="next" style="width: 5%; filter: invert(1); right: 0;">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Why BU-MARKET? Features Section (Desktop/Tablet View) -->
+<div class="my-5 py-5 border-top border-bottom border-light features-container d-none d-md-block">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-4 text-center text-lg-start">
+            <span class="features-tagline">The Campus Advantage</span>
+            <h2 class="features-title mt-2 mb-3">Why Shop & Sell on BU-MARKET?</h2>
+            <p class="text-muted mb-4 fs-5">
+                Built exclusively for the Bugema University community, we eliminate platform commissions and shipping delays.
+            </p>
+            <a href="{% url 'core:browse' %}" class="btn btn-outline-primary-bu rounded-pill px-4 py-2 fw-semibold">
+                Start Exploring <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="row g-4">
+                <!-- Card 1 -->
+                <div class="col-md-6">
+                    <div class="feature-unique-card h-100">
+                        <div class="card-glow-element glow-blue"></div>
+                        <div class="card-content">
+                            <div class="feature-icon-spotlight spotlight-blue shadow-sm">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-3">Bugema Community First</h5>
+                            <p class="text-muted mb-3 small">
+                                Secure direct trading between students, staff, and campus sellers. Safe, localized, and verified.
+                            </p>
+                            <span class="badge bg-primary-bu bg-opacity-10 text-primary-bu border border-primary border-opacity-10 py-1.5 px-3 rounded-pill small">Localized</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="col-md-6">
+                    <div class="feature-unique-card h-100">
+                        <div class="card-glow-element glow-green"></div>
+                        <div class="card-content">
+                            <div class="feature-icon-spotlight spotlight-green shadow-sm">
+                                <i class="bi bi-whatsapp"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-3">Instant Connections</h5>
+                            <p class="text-muted mb-3 small">
+                                Direct deals with no waiting. Reach out to the seller instantly via WhatsApp or direct phone call to seal the trade.
+                            </p>
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 py-1.5 px-3 rounded-pill small">Direct Trade</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card 3 -->
+                <div class="col-lg-12">
+                    <div class="feature-unique-card">
+                        <div class="card-glow-element glow-gold"></div>
+                        <div class="card-content">
+                            <div class="row align-items-center g-3">
+                                <div class="col-sm-2 col-md-3 col-lg-2 text-center text-sm-start">
+                                    <div class="feature-icon-spotlight spotlight-gold shadow-sm mx-auto mb-0">
+                                        <i class="bi bi-coin"></i>
+                                    </div>
+                                </div>
+                                <div class="col-sm-10 col-md-9 col-lg-10">
+                                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                                        <h5 class="fw-bold text-dark mb-0">Keep 100% of Your Profits</h5>
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10 py-1.5 px-3 rounded-pill small">0% Commission</span>
+                                    </div>
+                                    <p class="text-muted mb-0 small">
+                                        Zero listing commissions or hidden buyer fees. What you negotiate is exactly what you pocket. BU-MARKET is entirely free for Bugema University sellers.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Why BU-MARKET? Features Section (Mobile View - Brief and Precise) -->
+<div class="d-block d-md-none my-4 py-4 px-3 bg-white border border-light rounded-4 shadow-sm">
+    <h4 class="fw-bold text-center text-primary-bu mb-4 fs-6">Why Shop & Sell on BU-MARKET?</h4>
+    <div class="d-flex flex-column gap-3">
+        <!-- Feature 1 -->
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-shrink-0 rounded-circle bg-primary-bu bg-opacity-10 text-primary-bu p-2.5 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                <i class="bi bi-people-fill fs-5"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0.5 text-dark" style="font-size: 0.9rem;">Campus Verified</h6>
+                <p class="text-muted mb-0" style="font-size: 0.75rem;">Direct and safe trading between students & staff.</p>
+            </div>
+        </div>
+        
+        <!-- Feature 2 -->
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-shrink-0 rounded-circle bg-success bg-opacity-10 text-success p-2.5 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                <i class="bi bi-whatsapp fs-5"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0.5 text-dark" style="font-size: 0.9rem;">Instant Deals</h6>
+                <p class="text-muted mb-0" style="font-size: 0.75rem;">Connect directly via phone call or WhatsApp button.</p>
+            </div>
+        </div>
+        
+        <!-- Feature 3 -->
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-shrink-0 rounded-circle bg-warning bg-opacity-10 text-warning p-2.5 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                <i class="bi bi-coin fs-5"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0.5 text-dark" style="font-size: 0.9rem;">0% Commission</h6>
+                <p class="text-muted mb-0" style="font-size: 0.75rem;">List for free and pocket 100% of your profits.</p>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -51,32 +342,37 @@
     <h3 class="fw-bold mb-4 d-flex align-items-center">
         <i class="bi bi-star-fill text-accent-bu me-2"></i> Promoted Advertisements
     </h3>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
         {% for listing in promoted_listings %}
             <div class="col">
-                <div class="card h-100 listing-card border-0 position-relative">
-                    <!-- Promoted Badge -->
-                    <span class="position-absolute top-0 end-0 bg-accent-bu text-dark px-3 py-1 rounded-bl fw-bold shadow-sm small" style="border-bottom-left-radius: 12px; border-top-right-radius: 12px; z-index: 10;">
-                        <i class="bi bi-lightning-fill"></i> PROMOTED
+                <div class="card h-100 listing-card border-0 position-relative shadow-sm">
+                    <!-- Promoted Badge VIP -->
+                    <span class="promoted-badge-vip">
+                        <i class="bi bi-lightning-fill me-1"></i>PROMOTED
                     </span>
                     
-                    {% if listing.image %}
-                        <img src="{{ listing.image.url }}" class="card-img-top" alt="{{ listing.title }}" style="height: 180px; object-fit: cover;">
-                    {% else %}
-                        <div class="bg-secondary text-white text-center py-5" style="height: 180px;">No Image</div>
-                    {% endif %}
+                    <div class="listing-card-img-wrapper">
+                        {% if listing.image %}
+                            <img src="{{ listing.image.url }}" class="listing-card-img" alt="{{ listing.title }}">
+                        {% else %}
+                            <div class="placeholder-image-gradient text-muted">
+                                <i class="bi bi-image fs-1 mb-1"></i>
+                                <span class="small">No Image</span>
+                            </div>
+                        {% endif %}
+                    </div>
                     
                     <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <span class="badge bg-primary-bu">{{ listing.category.name }}</span>
+                        <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-1">
+                            <span class="badge bg-primary-bu bg-opacity-10 text-primary-bu border border-primary border-opacity-10">{{ listing.category.name }}</span>
                             <span class="badge text-uppercase bg-light text-dark border">{{ listing.get_condition_display }}</span>
                         </div>
                         <h5 class="card-title fw-bold text-truncate mb-1">{{ listing.title }}</h5>
-                        <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger"></i> {{ listing.location }}</p>
+                        <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ listing.location }}</p>
                         
                         <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <span class="text-primary-bu fw-bold fs-5">{{ listing.price }} UGX</span>
-                            <a href="{% url 'core:listing_detail' listing.slug %}" class="btn btn-primary-bu btn-sm px-3">View</a>
+                            <span class="text-primary-bu fw-bold fs-5 text-nowrap">{{ listing.price }} UGX</span>
+                            <a href="{% url 'core:listing_detail' listing.slug %}" class="btn btn-primary-bu btn-sm px-3 rounded-pill">View</a>
                         </div>
                     </div>
                 </div>
@@ -92,31 +388,36 @@
         <h3 class="fw-bold mb-0 d-flex align-items-center">
             <i class="bi bi-clock-history text-primary-bu me-2"></i> Recent Listings
         </h3>
-        <a href="{% url 'core:browse' %}" class="text-primary-bu fw-semibold text-decoration-none">View All <i class="bi bi-arrow-right"></i></a>
+        <a href="{% url 'core:browse' %}" class="text-primary-bu fw-semibold text-decoration-none hover-underline">View All <i class="bi bi-arrow-right ms-1"></i></a>
     </div>
     
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
         {% for listing in listings %}
             {% if not listing.is_promoted %}
             <div class="col">
-                <div class="card h-100 listing-card border-0">
-                    {% if listing.image %}
-                        <img src="{{ listing.image.url }}" class="card-img-top" alt="{{ listing.title }}" style="height: 180px; object-fit: cover;">
-                    {% else %}
-                        <div class="bg-secondary text-white text-center py-5" style="height: 180px;">No Image</div>
-                    {% endif %}
+                <div class="card h-100 listing-card border-0 shadow-sm">
+                    <div class="listing-card-img-wrapper">
+                        {% if listing.image %}
+                            <img src="{{ listing.image.url }}" class="listing-card-img" alt="{{ listing.title }}">
+                        {% else %}
+                            <div class="placeholder-image-gradient text-muted">
+                                <i class="bi bi-image fs-1 mb-1"></i>
+                                <span class="small">No Image</span>
+                            </div>
+                        {% endif %}
+                    </div>
                     
                     <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-1">
                             <span class="badge bg-light text-dark border">{{ listing.category.name }}</span>
                             <span class="badge text-uppercase bg-light text-dark border">{{ listing.get_condition_display }}</span>
                         </div>
                         <h5 class="card-title fw-bold text-truncate mb-1">{{ listing.title }}</h5>
-                        <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger"></i> {{ listing.location }}</p>
+                        <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ listing.location }}</p>
                         
                         <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <span class="text-primary-bu fw-bold fs-5">{{ listing.price }} UGX</span>
-                            <a href="{% url 'core:listing_detail' listing.slug %}" class="btn btn-outline-primary-bu btn-sm px-3">View</a>
+                            <span class="text-primary-bu fw-bold fs-5 text-nowrap">{{ listing.price }} UGX</span>
+                            <a href="{% url 'core:listing_detail' listing.slug %}" class="btn btn-outline-primary-bu btn-sm px-3 rounded-pill">View</a>
                         </div>
                     </div>
                 </div>
@@ -124,10 +425,35 @@
             {% endif %}
         {% empty %}
             <div class="col-12 text-center py-5">
-                <i class="bi bi-basket text-muted display-4"></i>
-                <p class="mt-3 text-muted">No active listings available. Be the first to sell!</p>
+                <div class="d-inline-flex p-4 rounded-circle bg-light mb-3 text-muted">
+                    <i class="bi bi-basket display-4"></i>
+                </div>
+                <p class="mt-3 text-muted fw-semibold">No active listings available right now. Be the first to start selling!</p>
             </div>
         {% endfor %}
+    </div>
+</div>
+
+<!-- Bottom CTA Banner -->
+<div class="my-5 p-4 p-md-5 text-center text-white rounded-4 hero-gradient overflow-hidden shadow-lg">
+    <div class="hero-bg-blobs">
+        <div class="hero-blob hero-blob-1" style="left: 10%; top: -20px; opacity: 0.1;"></div>
+        <div class="hero-blob hero-blob-2" style="right: 5%; bottom: -50px; opacity: 0.1;"></div>
+    </div>
+    <div class="py-4 position-relative" style="z-index: 2;">
+        <h2 class="display-6 fw-bold mb-3">Ready to sell your hostel items or textbooks?</h2>
+        <p class="fs-5 text-white-50 col-md-8 mx-auto mb-4">Join thousands of students and campus sellers at Bugema University. List your products and start receiving WhatsApp calls in minutes!</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold shadow-sm">Get Started Now</a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold">Login</a>
+            {% elif user.is_seller %}
+                <a href="{% url 'dashboard:create_listing' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold shadow-sm">Post a New Listing</a>
+                <a href="{% url 'dashboard:home' %}" class="btn btn-outline-light btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold">Seller Dashboard</a>
+            {% else %}
+                <a href="{% url 'core:browse' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold shadow-sm">Start Browsing</a>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}
