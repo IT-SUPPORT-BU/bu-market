@@ -4,7 +4,7 @@ from .models import Listing
 class ListingForm(forms.ModelForm):
     class Meta:
         model = Listing
-        fields = ['category', 'title', 'description', 'price', 'condition', 'location', 'image', 'is_promoted']
+        fields = ['category', 'title', 'description', 'price', 'condition', 'location', 'image', 'is_promoted', 'phone_number', 'whatsapp_number']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }

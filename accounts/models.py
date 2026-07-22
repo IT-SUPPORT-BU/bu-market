@@ -56,6 +56,15 @@ class User(AbstractUser):
             return sub.plan.max_active_listings
         return 0
 
+    @property
+    def is_verified_buyer(self):
+        if self.is_superuser or self.role in [self.Role.ADMIN, self.Role.MODERATOR, self.Role.ACCOUNTANT]:
+            return True
+        try:
+            return self.buyer_membership.status == 'ACTIVE'
+        except AttributeError:
+            return False
+
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
 

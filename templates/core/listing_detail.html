@@ -5,96 +5,111 @@
 {% block content %}
 <div class="row">
     <!-- Back to search -->
-    <div class="col-12 mb-3">
-        <a href="{% url 'core:browse' %}" class="text-primary-bu text-decoration-none fw-semibold">
-            <i class="bi bi-arrow-left"></i> Back to browse
+    <div class="col-12 mb-4">
+        <a href="{% url 'core:browse' %}" class="text-primary-bu text-decoration-none fw-semibold d-inline-flex align-items-center gap-2">
+            <i class="bi bi-arrow-left fs-5"></i> Back to Browse Marketplace
         </a>
     </div>
 </div>
 
-<div class="row">
-    <!-- Listing details -->
+<div class="row g-4">
+    <!-- Listing Details & Media -->
     <div class="col-lg-8">
-        <div class="card border-0 shadow-sm overflow-hidden mb-4">
-            <!-- Listing Image -->
+        <!-- Status warnings (if pending/rejected/sold) -->
+        {% if listing.status == 'PENDING' %}
+            <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-3 fs-4 text-warning"></i>
+                <div>
+                    <strong>Pending Moderation:</strong> This listing is currently awaiting approval from the moderator team and is only visible to you.
+                </div>
+            </div>
+        {% elif listing.status == 'REJECTED' %}
+            <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-x-circle-fill me-3 fs-4 text-danger"></i>
+                <div>
+                    <strong>Listing Rejected:</strong> This listing has been rejected by moderation and is hidden from public browse.
+                </div>
+            </div>
+        {% elif listing.status == 'SOLD' %}
+            <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-3 fs-4 text-info"></i>
+                <div>
+                    <strong>Item Sold:</strong> This item has been marked as sold by the seller.
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Image Card -->
+        <div class="card border-0 shadow-sm overflow-hidden mb-4 rounded-4">
+            <!-- Listing Image Container (Fixed to fit the image inside the container well) -->
             {% if listing.image %}
-                <img src="{{ listing.image.url }}" class="img-fluid w-100" alt="{{ listing.title }}" style="max-height: 480px; object-fit: cover;">
+                <div class="listing-media-wrapper">
+                    <img src="{{ listing.image.url }}" class="listing-detail-image" alt="{{ listing.title }}">
+                </div>
             {% else %}
-                <div class="bg-secondary text-white text-center py-5">
-                    <i class="bi bi-image display-1"></i>
-                    <p>No Image Available</p>
+                <div class="bg-secondary text-white text-center py-5 d-flex flex-column align-items-center justify-content-center" style="height: 350px;">
+                    <i class="bi bi-image display-1 mb-2"></i>
+                    <p class="fs-5">No Image Available</p>
                 </div>
             {% endif %}
-            
+
             <div class="card-body p-4">
-                <!-- Status warnings (if pending/rejected/sold) -->
-                {% if listing.status == 'PENDING' %}
-                    <div class="alert alert-warning d-flex align-items-center" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        This listing is currently <strong>pending moderation approval</strong> and is only visible to you.
+                <!-- Badges & Stats row -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-primary-bu px-3 py-2 rounded-pill">{{ listing.category.name }}</span>
+                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill text-uppercase">{{ listing.get_condition_display }}</span>
                     </div>
-                {% elif listing.status == 'REJECTED' %}
-                    <div class="alert alert-danger d-flex align-items-center" role="alert">
-                        <i class="bi bi-x-circle-fill me-2"></i>
-                        This listing has been <strong>rejected by moderation</strong>.
-                    </div>
-                {% elif listing.status == 'SOLD' %}
-                    <div class="alert alert-info d-flex align-items-center" role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        This item is marked as <strong>SOLD</strong>.
-                    </div>
-                {% endif %}
-                
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <span class="badge bg-primary-bu me-1">{{ listing.category.name }}</span>
-                        <span class="badge text-uppercase bg-light text-dark border">{{ listing.get_condition_display }}</span>
-                    </div>
-                    <small class="text-muted d-flex align-items-center">
-                        <i class="bi bi-eye-fill me-1"></i> {{ listing.views_count }} views
+                    <small class="text-muted d-flex align-items-center gap-1">
+                        <i class="bi bi-eye-fill"></i> {{ listing.views_count }} views
                     </small>
                 </div>
-                
-                <h1 class="fw-bold mb-3">{{ listing.title }}</h1>
-                <h2 class="text-primary-bu fw-bold mb-4">{{ listing.price }} UGX</h2>
-                
-                <hr>
-                
-                <h4 class="fw-bold mb-3">Description</h4>
-                <p class="fs-5 text-dark" style="white-space: pre-wrap;">{{ listing.description }}</p>
-                
-                <hr class="my-4">
-                
-                <div class="row text-center g-3">
+
+                <!-- Product Header Info -->
+                <h1 class="fw-bold mb-2 text-dark">{{ listing.title }}</h1>
+                <h2 class="text-primary-bu fw-extrabold mb-4">{{ listing.price }} UGX</h2>
+
+                <hr class="my-4 text-muted">
+
+                <!-- Specifications Grid -->
+                <h4 class="fw-bold mb-3 text-dark">Specifications</h4>
+                <div class="row g-3 mb-4">
                     <div class="col-6 col-md-4">
-                        <div class="p-3 bg-light rounded">
-                            <small class="text-muted d-block">Condition</small>
-                            <span class="fw-semibold text-uppercase">{{ listing.get_condition_display }}</span>
+                        <div class="spec-box">
+                            <div class="spec-title">Condition</div>
+                            <div class="spec-value text-uppercase">{{ listing.get_condition_display }}</div>
                         </div>
                     </div>
                     <div class="col-6 col-md-4">
-                        <div class="p-3 bg-light rounded">
-                            <small class="text-muted d-block">Location</small>
-                            <span class="fw-semibold text-truncate d-block">{{ listing.location }}</span>
+                        <div class="spec-box">
+                            <div class="spec-title">Location</div>
+                            <div class="spec-value text-truncate" title="{{ listing.location }}">{{ listing.location }}</div>
                         </div>
                     </div>
                     <div class="col-12 col-md-4">
-                        <div class="p-3 bg-light rounded">
-                            <small class="text-muted d-block">Published</small>
-                            <span class="fw-semibold">{{ listing.created_at|date:"M d, Y" }}</span>
+                        <div class="spec-box">
+                            <div class="spec-title">Published</div>
+                            <div class="spec-value">{{ listing.created_at|date:"M d, Y" }}</div>
                         </div>
                     </div>
                 </div>
+
+                <hr class="my-4 text-muted">
+
+                <!-- Description -->
+                <h4 class="fw-bold mb-3 text-dark">Description</h4>
+                <div class="fs-6 text-dark-emphasis lh-base" style="white-space: pre-wrap; font-weight: 400;">{{ listing.description }}</div>
             </div>
         </div>
     </div>
-    
-    <!-- Seller Info & Action Panel -->
+
+    <!-- Right Column: Seller Profile & Contact Section -->
     <div class="col-lg-4">
-        <div class="card border-0 shadow-sm p-4 text-center mb-4">
-            <h4 class="fw-bold mb-4 text-start">Seller Information</h4>
+        <!-- Seller details -->
+        <div class="card border-0 shadow-sm p-4 text-center mb-4 rounded-4">
+            <h4 class="fw-bold mb-3 text-start text-dark">Seller Information</h4>
             
-            <div class="rounded-circle bg-light p-3 mx-auto mb-3 d-flex align-items-center justify-content-center text-primary-bu" style="width: 80px; height: 80px;">
+            <div class="rounded-circle bg-light p-3 mx-auto mb-3 d-flex align-items-center justify-content-center text-primary-bu border" style="width: 80px; height: 80px;">
                 <i class="bi bi-person-fill fs-1"></i>
             </div>
             
@@ -103,35 +118,91 @@
                     {{ listing.seller.username }}
                 </a>
             </h5>
-            
-            <!-- Seller Badge -->
+
+            <!-- Seller Badges -->
             {% with sub=listing.seller.active_subscription %}
                 {% if sub and sub.plan.badge != 'none' %}
-                    <div class="mb-3">
-                        <span class="badge text-uppercase {% if sub.plan.badge == 'SILVER' %}badge-silver{% elif sub.plan.badge == 'GOLD' %}badge-gold{% endif %} px-3 py-2">
-                            <i class="bi bi-patch-check-fill"></i> {{ sub.plan.badge }} Seller
+                    <div class="mb-3 mt-2">
+                        <span class="badge text-uppercase {% if sub.plan.badge == 'SILVER' %}badge-silver{% elif sub.plan.badge == 'GOLD' %}badge-gold{% endif %} px-3 py-2 rounded-pill shadow-sm">
+                            <i class="bi bi-patch-check-fill me-1"></i> {{ sub.plan.badge }} Seller
                         </span>
                     </div>
                 {% endif %}
             {% endwith %}
-            
+
             <p class="text-muted small">Registered: {{ listing.seller.date_joined|date:"M Y" }}</p>
-            
-            <hr class="my-3">
-            
-            <div class="d-grid gap-2">
-                <a href="mailto:{{ listing.seller.email }}?subject=BU-Market: {{ listing.title }}" class="btn btn-primary-bu py-2 btn-lg">
-                    <i class="bi bi-envelope-fill me-2"></i> Contact Seller
-                </a>
-                <a href="{% url 'core:seller_profile' listing.seller.username %}" class="btn btn-light py-2">
-                    <i class="bi bi-shop me-2"></i> View Seller Store
+
+            <hr class="my-4">
+
+            <!-- Premium Actions & Verification Locks -->
+            <div class="d-grid gap-2 text-start">
+                {% if request.user.is_authenticated %}
+                    {% if request.user == listing.seller or request.user.is_verified_buyer %}
+                        
+                        <h6 class="fw-bold text-muted mb-2 text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Contact Directly</h6>
+                        
+                        <!-- WhatsApp button -->
+                        {% if listing.whatsapp_number %}
+                            <a href="{{ listing.whatsapp_url }}" class="btn btn-whatsapp py-2.5 btn-lg d-flex align-items-center justify-content-center gap-2 mb-1" target="_blank">
+                                <i class="bi bi-whatsapp fs-5"></i> Chat on WhatsApp
+                            </a>
+                        {% endif %}
+
+                        <!-- Direct Call button -->
+                        {% if listing.phone_number %}
+                            <a href="{{ listing.tel_url }}" class="btn btn-call py-2.5 btn-lg d-flex align-items-center justify-content-center gap-2 mb-1">
+                                <i class="bi bi-telephone-fill fs-5"></i> Call Phone Number
+                            </a>
+                        {% endif %}
+
+                        <!-- Email Backup -->
+                        <a href="mailto:{{ listing.seller.email }}?subject=BU-Market: {{ listing.title }}" class="btn btn-outline-secondary py-2 d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-envelope-fill"></i> Email Seller
+                        </a>
+                        
+                        {% if not listing.whatsapp_number and not listing.phone_number %}
+                            <div class="alert alert-light border text-center small py-2 mb-0 mt-1">
+                                <i class="bi bi-info-circle me-1"></i> Seller did not provide phone numbers.
+                            </div>
+                        {% endif %}
+
+                    {% else %}
+                        <!-- Authenticated but not verified buyer -->
+                        <div class="contact-locked-card text-center">
+                            <i class="bi bi-shield-lock-fill text-primary-bu display-5 mb-2 d-block"></i>
+                            <h5 class="fw-bold mb-2">Contact Details Locked</h5>
+                            <p class="text-muted small mb-3">Verification is required to unlock direct seller phone and WhatsApp access. This ensures safety and trust on our campus marketplace.</p>
+                            <a href="{% url 'subscriptions:apply_buyer' %}" class="btn btn-accent-bu w-100 py-2.5 fw-bold rounded-3">
+                                <i class="bi bi-shield-check me-2"></i> Verify Buyer Membership
+                            </a>
+                            <hr class="my-3">
+                            <!-- Email remains open as secondary fallback -->
+                            <a href="mailto:{{ listing.seller.email }}?subject=BU-Market: {{ listing.title }}" class="btn btn-light w-100 btn-sm py-2">
+                                <i class="bi bi-envelope-fill me-1"></i> Email Seller Instead
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <!-- Not logged in -->
+                    <div class="contact-locked-card text-center">
+                        <i class="bi bi-lock-fill text-muted display-5 mb-2 d-block"></i>
+                        <h5 class="fw-bold mb-2">View Contact Details</h5>
+                        <p class="text-muted small mb-3">Please sign in or register to contact sellers and unlock phone/WhatsApp numbers.</p>
+                        <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-primary-bu w-100 py-2.5 fw-bold rounded-3">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Sign In to Account
+                        </a>
+                    </div>
+                {% endif %}
+
+                <a href="{% url 'core:seller_profile' listing.seller.username %}" class="btn btn-light py-2.5 mt-2 d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-shop"></i> View Seller Store
                 </a>
             </div>
         </div>
-        
+
         <!-- Safety Tips -->
-        <div class="card border-0 shadow-sm p-4 bg-light">
-            <h5 class="fw-bold mb-3 text-warning-emphasis"><i class="bi bi-shield-fill-exclamation"></i> Safety Tips</h5>
+        <div class="card border-0 shadow-sm p-4 bg-light rounded-4">
+            <h5 class="fw-bold mb-3 text-warning-emphasis"><i class="bi bi-shield-fill-exclamation me-1 text-warning"></i> Safety Tips</h5>
             <ul class="text-start small mb-0 ps-3">
                 <li class="mb-2">Meet in public, crowded campus spaces (e.g. Library, Cafe).</li>
                 <li class="mb-2">Never pay for an item before inspect-testing it.</li>

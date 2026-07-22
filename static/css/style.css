@@ -1,4 +1,158 @@
 /* Custom CSS style overrides for BU-MARKET */
+
 .navbar-brand {
     font-size: 1.5rem;
+    font-weight: 700;
 }
+
+/* Premium Image Details Container */
+.listing-media-wrapper {
+    background: #1e293b; /* Dark slate */
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 480px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.listing-media-wrapper:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.15);
+}
+
+.listing-detail-image {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain;
+    transition: transform 0.5s ease;
+}
+
+.listing-media-wrapper:hover .listing-detail-image {
+    transform: scale(1.02);
+}
+
+/* Custom badges */
+.badge-silver {
+    background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
+    color: white;
+}
+
+.badge-gold {
+    background: linear-gradient(135deg, #F39C12 0%, #F1C40F 100%);
+    color: #1A1D20;
+    font-weight: 700;
+}
+
+/* Premium Action Buttons */
+.btn-whatsapp {
+    background-color: #25D366;
+    color: white;
+    border: none;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-whatsapp:hover {
+    background-color: #20ba5a;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.btn-call {
+    background-color: #003B8E;
+    color: white;
+    border: none;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-call:hover {
+    background-color: #002b66;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 59, 142, 0.3);
+}
+
+/* Locked Section */
+.contact-locked-card {
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    background-color: #fcfcfd;
+    padding: 24px;
+    transition: all 0.3s ease;
+}
+
+.contact-locked-card:hover {
+    border-color: var(--primary-color);
+    background-color: #f8fafc;
+}
+
+/* Spec Box styling */
+.spec-box {
+    border-left: 4px solid var(--primary-color);
+    background-color: #f8f9fa;
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    height: 100%;
+}
+
+.spec-title {
+    font-size: 0.85rem;
+    color: #6C757D;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.spec-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1A1D20;
+}
+
+/* Browse/Home Product Card Layout Improvements */
+.listing-card {
+    border-radius: 16px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid #f1f5f9 !important;
+    overflow: hidden;
+}
+
+.listing-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 24px -4px rgba(0, 0, 0, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.03) !important;
+    border-color: #e2e8f0 !important;
+}
+
+.listing-card-img-wrapper {
+    background-color: #f8fafc; /* Very light slate */
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.listing-card-img {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain;
+    padding: 8px;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.listing-card:hover .listing-card-img {
+    transform: scale(1.04);
+}
+
