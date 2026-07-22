@@ -4,7 +4,7 @@ BU-MARKET is a mobile-first campus marketplace designed for the Bugema Universit
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 Follow these steps to set up and run the project locally on your machine.
 
