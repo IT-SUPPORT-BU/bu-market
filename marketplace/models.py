@@ -9,6 +9,7 @@ class Category(models.Model):
     slug = models.SlugField(max_length=60, unique=True, blank=True)
     icon = models.CharField(max_length=50, help_text="Bootstrap icon class name, e.g. bi-phone")
     is_active = models.BooleanField(default=True)
+    image = models.ImageField(upload_to='category_images/', blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Categories"
@@ -32,6 +33,7 @@ class Listing(models.Model):
         ACTIVE = 'ACTIVE', 'Active'
         SOLD = 'SOLD', 'Sold'
         REJECTED = 'REJECTED', 'Rejected'
+        REMOVED = 'REMOVED', 'Removed by Admin'
 
     seller = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -47,21 +49,18 @@ class Listing(models.Model):
     slug = models.SlugField(max_length=120, unique=True, blank=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=12, decimal_places=2)
-    condition = models.CharField(
-        max_length=10,
-        choices=Condition.choices,
-        default=Condition.USED
-    )
+    condition = models.CharField(max_length=10, choices=Condition.choices, default=Condition.NEW)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
+    sold_at = models.DateTimeField(null=True, blank=True)
+    removal_reason = models.TextField(blank=True, null=True)
+    # ... any other fields you already have (views_count, created_at, etc.)
     location = models.CharField(max_length=100, default='Bugema University Main Campus')
     image = models.ImageField(
         upload_to='listings/',
         validators=[validate_file_size]
     )
-    status = models.CharField(
-        max_length=15,
-        choices=Status.choices,
-        default=Status.PENDING
-    )
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
+    removal_reason = models.TextField(blank=True, null=True)
     is_promoted = models.BooleanField(default=False)
     views_count = models.PositiveIntegerField(default=0)
     phone_number = models.CharField(

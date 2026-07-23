@@ -132,6 +132,32 @@
 
             <p class="text-muted small">Registered: {{ listing.seller.date_joined|date:"M Y" }}</p>
 
+            
+        <hr class="my-3">
+
+<div class="d-grid gap-2">
+  {% if request.user != listing.seller %}
+    <a href="{% url 'messaging:start_conversation' listing.id %}" class="btn btn-primary-bu">
+        <i class="bi bi-envelope-fill me-2"></i> Contact Seller
+    </a>
+    <a href="{% url 'core:seller_profile' listing.seller.username %}" class="text-decoration-none">
+        <i class="bi bi-shop me-2"></i> View Seller Store
+    </a>
+  {% else %}
+    <div class="alert alert-secondary text-center mb-2">
+      This is your own listing.
+    </div>
+    {% if listing.status != listing.Status.SOLD %}
+      <form method="post" action="{% url 'core:mark_as_sold' listing.slug %}" onsubmit="return confirm('Mark this item as sold? This will end the buyer conversation.');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success w-100">Mark as Sold</button>
+      </form>
+    {% else %}
+      <div class="alert alert-success text-center mb-0">Sold on {{ listing.sold_at|date:"M d, Y" }}</div>
+    {% endif %}
+  {% endif %}
+    </div>
+
             <hr class="my-4">
 
             <!-- Premium Actions & Verification Locks -->
@@ -197,6 +223,7 @@
                 <a href="{% url 'core:seller_profile' listing.seller.username %}" class="btn btn-light py-2.5 mt-2 d-flex align-items-center justify-content-center gap-2">
                     <i class="bi bi-shop"></i> View Seller Store
                 </a>
+
             </div>
         </div>
 

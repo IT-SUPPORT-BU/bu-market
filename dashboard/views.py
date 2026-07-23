@@ -85,9 +85,8 @@ def create_listing(request):
         if form.is_valid():
             listing = form.save(commit=False)
             listing.seller = request.user
-            listing.status = Listing.Status.PENDING # Default to pending moderation
             listing.save()
-            messages.success(request, f'Listing "{listing.title}" created successfully and is pending moderation!')
+            messages.success(request, f'Listing "{listing.title}" created successfully and is now live!')
             return redirect('dashboard:seller_listings')
     else:
         form = ListingForm(user=request.user)

@@ -41,12 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Third party apps
     'rest_framework',
     'crispy_forms',
     'crispy_bootstrap5',
-    
+
     # Project apps
     'accounts.apps.AccountsConfig',
     'marketplace.apps.MarketplaceConfig',
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'moderation.apps.ModerationConfig',
     'dashboard.apps.DashboardConfig',
     'core.apps.CoreConfig',
+    'messaging.apps.MessagingConfig',
 ]
 
 MIDDLEWARE = [
@@ -81,6 +82,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.recently_viewed',
             ],
         },
     },
@@ -153,6 +155,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard:home'
 LOGOUT_REDIRECT_URL = 'core:home'
+LOGIN_URL = 'accounts:login'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

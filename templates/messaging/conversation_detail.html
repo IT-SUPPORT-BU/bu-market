@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-4" style="max-width: 600px;">
+  <div class="border rounded p-3 mb-3" style="height: 350px; overflow-y: auto;">
+    {% for message in messages_list %}
+      <div class="mb-2 {% if message.sender == request.user %}text-end{% endif %}">
+        <span class="badge {% if message.sender == request.user %}bg-primary{% else %}bg-secondary{% endif %}">
+          {{ message.sender.username }}
+        </span>
+        <div>{{ message.body }}</div>
+        <small class="text-muted">{{ message.sent_at|date:"M d, H:i" }}</small>
+      </div>
+    {% empty %}
+      <p class="text-muted">No messages yet — say hello!</p>
+    {% endfor %}
+  </div>
+
+  {% if limit_reached %}
+    <div class="alert alert-warning text-center small mb-0 py-2">
+      Message limit reached ({{ max_messages }}/{{ max_messages }}). Please agree on time & location to meet and finish the exchange in person.
+    </div>
+  {% else %}
+    <form method="post">
+      {% csrf_token %}
+    {{ form.body }}
+<div class="d-flex justify-content-between align-items-center mt-1">
+  <small id="word-count" class="text-muted">0 / 30 words</small>
+  <button type="submit" class="btn btn-primary-bu btn-sm">Send</button>
+</div>
+      {% if form.body.errors %}<div class="text-danger small">{{ form.body.errors }}</div>{% endif %}
+    </form>
+    <small class="text-muted d-block mt-1">{{ message_count }}/{{ max_messages }} messages used</small>
+  {% endif %}
+</div>
+
+<script>
+  const textarea = document.querySelector('textarea[name="body"]');
+  const counter = document.getElementById('word-count');
+  if (textarea) {
+    textarea.addEventListener('input', function() {
+      const words = this.value.trim().split(/\s+/).filter(Boolean);
+      counter.textContent = `${words.length} / 30 words`;
+      counter.classList.toggle('text-danger', words.length > 30);
+    });
+  }
+</script>
+{% endblock %}

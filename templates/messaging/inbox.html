@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-4" style="max-width: 500px;">
+  <h4>Your Messages</h4>
+  <div class="list-group">
+    {% for conversation in conversations %}
+      <a href="{% url 'messaging:conversation_detail' conversation.pk %}" class="list-group-item list-group-item-action">
+        <div class="d-flex justify-content-between">
+          <strong>{{ conversation.listing.title }}</strong>
+        </div>
+        <small class="text-muted">
+          {% if request.user == conversation.seller %}
+            Buyer: {{ conversation.buyer.username }}
+          {% else %}
+            Seller: {{ conversation.seller.username }}
+          {% endif %}
+        </small>
+      </a>
+    {% empty %}
+      <p class="text-muted">No conversations yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
