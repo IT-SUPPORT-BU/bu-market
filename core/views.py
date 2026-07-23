@@ -46,6 +46,12 @@ class BrowseView(ListView):
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
 
+
+        location = self.request.GET.get('location')
+        if location:
+            queryset = queryset.filter(location__icontains=location)
+
+
         min_price = self.request.GET.get('min_price')
         if min_price:
             try:
@@ -64,8 +70,17 @@ class BrowseView(ListView):
         if condition in [Listing.Condition.NEW, Listing.Condition.USED]:
             queryset = queryset.filter(condition=condition)
 
-        # Ordering: Promoted-first, newest-first
-        return queryset.order_by('-is_promoted', '-created_at')
+        sort_option = self.request.GET.get('sort', '')
+        if sort_option == 'price_asc':
+            ordering = ['-is_promoted', 'price', '-created_at']
+        elif sort_option == 'price_desc':
+            ordering = ['-is_promoted', '-price', '-created_at']
+        elif sort_option == 'oldest':
+            ordering = ['-is_promoted', 'created_at']
+        else:
+            ordering = ['-is_promoted', '-created_at']
+
+        return queryset.order_by(*ordering)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

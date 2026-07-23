@@ -63,8 +63,36 @@ class Listing(models.Model):
     removal_reason = models.TextField(blank=True, null=True)
     is_promoted = models.BooleanField(default=False)
     views_count = models.PositiveIntegerField(default=0)
+    phone_number = models.CharField(
+        max_length=20, 
+        blank=True, 
+        null=True, 
+        help_text="Phone number for calls (e.g. +256700000000)"
+    )
+    whatsapp_number = models.CharField(
+        max_length=20, 
+        blank=True, 
+        null=True, 
+        help_text="WhatsApp number (e.g. +256700000000)"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def whatsapp_url(self):
+        if not self.whatsapp_number:
+            return None
+        cleaned = "".join(c for c in self.whatsapp_number if c.isdigit())
+        if cleaned.startswith('0'):
+            cleaned = '256' + cleaned[1:]
+        return f"https://wa.me/{cleaned}"
+
+    @property
+    def tel_url(self):
+        if not self.phone_number:
+            return None
+        cleaned = "".join(c for c in self.phone_number if c.isdigit() or c == '+')
+        return f"tel:{cleaned}"
 
     def save(self, *args, **kwargs):
         if not self.slug:
