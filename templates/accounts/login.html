@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block title %}Login | BU-MARKET{% endblock %}
@@ -8,7 +9,7 @@
     <div class="col-md-6 col-lg-5">
         <div class="card border-0 shadow-sm p-4 rounded-3">
             <div class="text-center mb-4">
-                <i class="bi bi-shop text-primary-bu display-3 mb-2"></i>
+                <img src="{% static 'images/bu-market-logo2.png' %}" alt="BU-MARKET Logo" style="max-height: 95px; width: auto;" class="mb-3">
                 <h2 class="fw-bold">Sign In to BU-MARKET</h2>
                 <p class="text-muted">Enter your campus credentials to continue</p>
             </div>

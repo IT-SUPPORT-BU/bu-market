@@ -14,6 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/bu-market-logo1.png' %}">
 
     <style>
         :root {
@@ -187,7 +189,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary-bu sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{% url 'core:home' %}">
-                <i class="bi bi-shop text-accent-bu me-2 fs-3"></i>
+                <img src="{% static 'images/bu-market-logo1.png' %}" alt="BU-MARKET Logo" height="38" class="me-2 rounded-2 shadow-sm border border-white border-opacity-25" style="object-fit: contain;">
                 <span class="fw-bold tracking-wide">BU-MARKET</span>
             </a>
 
@@ -273,9 +275,9 @@
             <div class="row g-4">
                 <!-- Column 1: Brand -->
                 <div class="col-lg-4 mb-4 mb-lg-0">
-                    <h5 class="text-white fw-bold d-flex align-items-center mb-3">
-                        <i class="bi bi-shop text-accent-bu me-2"></i>BU-MARKET
-                    </h5>
+                    <a href="{% url 'core:home' %}" class="d-inline-block text-decoration-none mb-3">
+                        <img src="{% static 'images/bu-market-logo2.png' %}" alt="BU-MARKET Logo" height="52" class="bg-white p-1.5 rounded-3 shadow-sm">
+                    </a>
                     <p class="text-white-50 small mb-3">
                         The ultimate student-led community marketplace for Bugema University. Buy, sell, and connect commission-free.
                     </p>
@@ -343,9 +345,10 @@
     <!-- Mobile Footer (Visible only on mobile/tablet screens) -->
     <footer class="mobile-footer py-4 px-3 d-md-none text-center">
         <div class="container">
-            <h6 class="text-white fw-bold mb-2">
-                <i class="bi bi-shop text-accent-bu me-1"></i> BU-MARKET
-            </h6>
+            <div class="d-flex justify-content-center align-items-center mb-2">
+                <img src="{% static 'images/bu-market-logo1.png' %}" alt="BU-MARKET Logo" height="40" class="rounded-2 shadow-sm border border-white border-opacity-25 me-2">
+                <span class="text-white fw-bold fs-5">BU-MARKET</span>
+            </div>
             <p class="text-muted small mb-3">Excellence in Market</p>
             
             <div class="d-flex justify-content-center gap-2 mb-3">

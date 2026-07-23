@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Home | BU-MARKET{% endblock %}
 
@@ -58,6 +59,11 @@
         <!-- Animated Stat Graphics for Larger Screens -->
         <div class="col-lg-5 d-none d-lg-block text-end mt-4 mt-lg-0">
             <div class="row g-3 justify-content-end" style="max-width: 420px; margin-left: auto;">
+                <div class="col-12 text-center mb-1">
+                    <div class="hero-stat-card animate-float shadow bg-white p-3 rounded-4 d-inline-block w-100">
+                        <img src="{% static 'images/bu-market-logo2.png' %}" alt="BU-MARKET Logo" style="max-height: 105px; width: auto;">
+                    </div>
+                </div>
                 <div class="col-6">
                     <div class="hero-stat-card animate-float shadow">
                         <i class="bi bi-shield-check text-accent-bu fs-3 mb-2 d-block"></i>
@@ -70,19 +76,6 @@
                         <i class="bi bi-lightning-charge text-accent-bu fs-3 mb-2 d-block"></i>
                         <div class="fw-bold fs-5">Fast Deals</div>
                         <div class="small text-white-50">WhatsApp / Call</div>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="hero-stat-card animate-float shadow" style="animation-delay: 2s;">
-                        <div class="d-flex align-items-center justify-content-center gap-3">
-                            <div class="rounded-circle bg-white bg-opacity-10 p-2.5 d-flex align-items-center justify-content-center">
-                                <i class="bi bi-tag-fill text-accent-bu fs-3"></i>
-                            </div>
-                            <div class="text-start">
-                                <div class="fw-bold">0% Commission</div>
-                                <div class="small text-white-50">Keep all your profits locally</div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -99,6 +92,9 @@
     </div>
     
     <div class="position-relative" style="z-index: 2;">
+        <div class="mb-2">
+            <img src="{% static 'images/bu-market-logo1.png' %}" alt="BU-MARKET Logo" height="48" class="rounded-3 shadow-sm border border-white border-opacity-25">
+        </div>
         <!-- Mobile Slogan Badge -->
         <span class="badge bg-white bg-opacity-10 text-accent-bu border border-warning border-opacity-25 px-3 py-2 rounded-pill fw-semibold text-uppercase tracking-wider mb-2.5" style="font-size: 0.7rem; letter-spacing: 0.5px;">
             <i class="bi bi-patch-check-fill me-1 text-accent-bu"></i> Excellence in Market
