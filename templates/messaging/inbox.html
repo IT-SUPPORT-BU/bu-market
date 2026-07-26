@@ -3,18 +3,24 @@
 <div class="container my-4" style="max-width: 500px;">
   <h4>Your Messages</h4>
   <div class="list-group">
-    {% for conversation in conversations %}
-      <a href="{% url 'messaging:conversation_detail' conversation.pk %}" class="list-group-item list-group-item-action">
-        <div class="d-flex justify-content-between">
-          <strong>{{ conversation.listing.title }}</strong>
+    {% for item in conversation_items %}
+      <a href="{% url 'messaging:conversation_detail' item.conversation.pk %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
+        <div>
+          <strong>{{ item.conversation.listing.title }}</strong>
+          <div class="small text-muted mt-1">
+            {% if request.user == item.conversation.seller %}
+              Buyer: {{ item.conversation.buyer.username }}
+            {% else %}
+              Seller: {{ item.conversation.seller.username }}
+            {% endif %}
+            {% if item.last_sender_name %}
+              • Last message from {{ item.last_sender_name }}
+            {% endif %}
+          </div>
         </div>
-        <small class="text-muted">
-          {% if request.user == conversation.seller %}
-            Buyer: {{ conversation.buyer.username }}
-          {% else %}
-            Seller: {{ conversation.seller.username }}
-          {% endif %}
-        </small>
+        {% if item.unread > 0 %}
+        <span class="badge bg-danger rounded-pill">{{ item.unread }} new</span>
+        {% endif %}
       </a>
     {% empty %}
       <p class="text-muted">No conversations yet.</p>

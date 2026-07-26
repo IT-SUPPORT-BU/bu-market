@@ -30,8 +30,19 @@ def conversation_detail(request, pk):
 
     message_count = conversation.messages.count()
     limit_reached = message_count >= MAX_MESSAGES_PER_CONVERSATION
-    whatsapp_url = conversation.listing.whatsapp_url
-    whatsapp_number = conversation.listing.whatsapp_number
+    is_seller_view = request.user == conversation.seller
+
+    if is_seller_view:
+        target_whatsapp_url = conversation.buyer.whatsapp_url
+        target_whatsapp_number = conversation.buyer.whatsapp_number
+        whatsapp_label = f"Buyer WhatsApp"
+    else:
+        target_whatsapp_url = conversation.listing.whatsapp_url
+        target_whatsapp_number = conversation.listing.whatsapp_number
+        whatsapp_label = "Seller WhatsApp"
+
+    whatsapp_url = target_whatsapp_url or conversation.listing.whatsapp_url
+    whatsapp_number = target_whatsapp_number or conversation.listing.whatsapp_number
 
     if request.method == 'POST':
         if limit_reached:
@@ -48,6 +59,9 @@ def conversation_detail(request, pk):
     else:
         form = MessageForm()
 
+    # Mark incoming messages read when the recipient opens the conversation
+    conversation.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+
     messages_list = conversation.messages.select_related('sender')
     return render(request, 'messaging/conversation_detail.html', {
         'conversation': conversation,
@@ -58,10 +72,19 @@ def conversation_detail(request, pk):
         'max_messages': MAX_MESSAGES_PER_CONVERSATION,
         'whatsapp_url': whatsapp_url,
         'whatsapp_number': whatsapp_number,
+        'whatsapp_label': whatsapp_label,
     })
 
 
 @login_required
 def inbox(request):
-    conversations = Conversation.objects.filter(buyer=request.user) | Conversation.objects.filter(seller=request.user)
-    return render(request, 'messaging/inbox.html', {'conversations': conversations.distinct()})
+    conversations = (Conversation.objects.filter(buyer=request.user) | Conversation.objects.filter(seller=request.user)).distinct().select_related('listing', 'buyer', 'seller')
+    conversation_items = []
+    for conversation in conversations:
+        conversation_items.append({
+            'conversation': conversation,
+            'unread': conversation.messages.filter(is_read=False).exclude(sender=request.user).count(),
+            'last_sender_name': conversation.last_sender.username if conversation.last_sender else None,
+        })
+
+    return render(request, 'messaging/inbox.html', {'conversation_items': conversation_items})
