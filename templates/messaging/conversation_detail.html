@@ -16,17 +16,29 @@
   </div>
 
   {% if limit_reached %}
-    <div class="alert alert-warning text-center small mb-0 py-2">
-      Message limit reached ({{ max_messages }}/{{ max_messages }}). Please agree on time & location to meet and finish the exchange in person.
+    <div class="alert alert-warning text-center small mb-2 py-2">
+      Message limit reached ({{ max_messages }}/{{ max_messages }}). Please continue on WhatsApp if the seller has provided a contact number.
     </div>
+    {% if whatsapp_url %}
+      <div class="d-grid gap-2 mb-3">
+        <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success btn-lg">
+          <i class="bi bi-whatsapp"></i> Continue on WhatsApp
+        </a>
+      </div>
+      <p class="text-center small text-muted mb-0">Seller WhatsApp: {{ whatsapp_number }}</p>
+    {% else %}
+      <div class="alert alert-secondary text-center small mb-0 py-2">
+        The seller has not provided a WhatsApp number. Please use another contact channel.
+      </div>
+    {% endif %}
   {% else %}
     <form method="post">
       {% csrf_token %}
-    {{ form.body }}
-<div class="d-flex justify-content-between align-items-center mt-1">
-  <small id="word-count" class="text-muted">0 / 30 words</small>
-  <button type="submit" class="btn btn-primary-bu btn-sm">Send</button>
-</div>
+      {{ form.body }}
+      <div class="d-flex justify-content-between align-items-center mt-1">
+        <small id="word-count" class="text-muted">0 / 30 words</small>
+        <button type="submit" class="btn btn-primary-bu btn-sm">Send</button>
+      </div>
       {% if form.body.errors %}<div class="text-danger small">{{ form.body.errors }}</div>{% endif %}
     </form>
     <small class="text-muted d-block mt-1">{{ message_count }}/{{ max_messages }} messages used</small>
