@@ -83,6 +83,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.recently_viewed',
+                'messaging.context_processors.unread_message_counts',
             ],
         },
     },
@@ -152,10 +153,9 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 # Login/Logout redirects
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'dashboard:home'
-LOGOUT_REDIRECT_URL = 'core:home'
 LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'core:home'
+LOGOUT_REDIRECT_URL = 'core:home'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
