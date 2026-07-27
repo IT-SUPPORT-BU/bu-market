@@ -56,6 +56,19 @@ class User(AbstractUser):
             return sub.plan.max_active_listings
         return 0
 
+    phone_number = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        help_text="Phone number for calls (e.g. +256700000000)"
+    )
+    whatsapp_number = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        help_text="WhatsApp number (e.g. +256700000000)"
+    )
+
     @property
     def is_verified_buyer(self):
         if self.is_superuser or self.role in [self.Role.ADMIN, self.Role.MODERATOR, self.Role.ACCOUNTANT]:
@@ -64,6 +77,22 @@ class User(AbstractUser):
             return self.buyer_membership.status == 'ACTIVE'
         except AttributeError:
             return False
+
+    @property
+    def whatsapp_url(self):
+        if not self.whatsapp_number:
+            return None
+        cleaned = "".join(c for c in self.whatsapp_number if c.isdigit())
+        if cleaned.startswith('0'):
+            cleaned = '256' + cleaned[1:]
+        return f"https://wa.me/{cleaned}"
+
+    @property
+    def tel_url(self):
+        if not self.phone_number:
+            return None
+        cleaned = "".join(c for c in self.phone_number if c.isdigit() or c == '+')
+        return f"tel:{cleaned}"
 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
