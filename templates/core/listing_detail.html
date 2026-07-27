@@ -165,65 +165,33 @@
 
             <hr class="my-4">
 
-            <!-- Premium Actions & Verification Locks -->
-            <div class="d-grid gap-2 text-start">
-                {% if request.user.is_authenticated %}
-                    {% if request.user == listing.seller or request.user.is_verified_buyer %}
-                        
-                        <h6 class="fw-bold text-muted mb-2 text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Contact Directly</h6>
-                        
-                        <!-- WhatsApp button -->
-                        {% if listing.whatsapp_number %}
-                            <a href="{{ listing.whatsapp_url }}" class="btn btn-whatsapp py-2.5 btn-lg d-flex align-items-center justify-content-center gap-2 mb-1" target="_blank">
-                                <i class="bi bi-whatsapp fs-5"></i> Chat on WhatsApp
-                            </a>
-                        {% endif %}
+            <!-- Contact Directly — Open to all visitors (no account needed) -->
+            <h6 class="fw-bold text-muted mb-2 text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Contact Directly</h6>
 
-                        <!-- Direct Call button -->
-                        {% if listing.phone_number %}
-                            <a href="{{ listing.tel_url }}" class="btn btn-call py-2.5 btn-lg d-flex align-items-center justify-content-center gap-2 mb-1">
-                                <i class="bi bi-telephone-fill fs-5"></i> Call Phone Number
-                            </a>
-                        {% endif %}
+            <!-- WhatsApp button -->
+            {% if listing.whatsapp_number %}
+                <a href="{{ listing.whatsapp_url }}" class="btn btn-whatsapp py-2.5 btn-lg d-flex align-items-center justify-content-center gap-2 mb-1" target="_blank">
+                    <i class="bi bi-whatsapp fs-5"></i> Chat on WhatsApp
+                </a>
+            {% endif %}
 
-                        <!-- Email Backup -->
-                        <a href="mailto:{{ listing.seller.email }}?subject=BU-Market: {{ listing.title }}" class="btn btn-outline-secondary py-2 d-flex align-items-center justify-content-center gap-2">
-                            <i class="bi bi-envelope-fill"></i> Email Seller
-                        </a>
-                        
-                        {% if not listing.whatsapp_number and not listing.phone_number %}
-                            <div class="alert alert-light border text-center small py-2 mb-0 mt-1">
-                                <i class="bi bi-info-circle me-1"></i> Seller did not provide phone numbers.
-                            </div>
-                        {% endif %}
+            <!-- Direct Call button -->
+            {% if listing.phone_number %}
+                <a href="{{ listing.tel_url }}" class="btn btn-call py-2.5 btn-lg d-flex align-items-center justify-content-center gap-2 mb-1">
+                    <i class="bi bi-telephone-fill fs-5"></i> Call Phone Number
+                </a>
+            {% endif %}
 
-                    {% else %}
-                        <!-- Authenticated but not verified buyer -->
-                        <div class="contact-locked-card text-center">
-                            <i class="bi bi-shield-lock-fill text-primary-bu display-5 mb-2 d-block"></i>
-                            <h5 class="fw-bold mb-2">Contact Details Locked</h5>
-                            <p class="text-muted small mb-3">Verification is required to unlock direct seller phone and WhatsApp access. This ensures safety and trust on our campus marketplace.</p>
-                            <a href="{% url 'subscriptions:apply_buyer' %}" class="btn btn-accent-bu w-100 py-2.5 fw-bold rounded-3">
-                                <i class="bi bi-shield-check me-2"></i> Verify Buyer Membership
-                            </a>
-                            <hr class="my-3">
-                            <!-- Email remains open as secondary fallback -->
-                            <a href="mailto:{{ listing.seller.email }}?subject=BU-Market: {{ listing.title }}" class="btn btn-light w-100 btn-sm py-2">
-                                <i class="bi bi-envelope-fill me-1"></i> Email Seller Instead
-                            </a>
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <!-- Not logged in -->
-                    <div class="contact-locked-card text-center">
-                        <i class="bi bi-lock-fill text-muted display-5 mb-2 d-block"></i>
-                        <h5 class="fw-bold mb-2">View Contact Details</h5>
-                        <p class="text-muted small mb-3">Please sign in or register to contact sellers and unlock phone/WhatsApp numbers.</p>
-                        <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-primary-bu w-100 py-2.5 fw-bold rounded-3">
-                            <i class="bi bi-box-arrow-in-right me-2"></i> Sign In to Account
-                        </a>
-                    </div>
-                {% endif %}
+            <!-- Email Backup -->
+            <a href="mailto:{{ listing.seller.email }}?subject=BU-Market: {{ listing.title }}" class="btn btn-outline-secondary py-2 d-flex align-items-center justify-content-center gap-2">
+                <i class="bi bi-envelope-fill"></i> Email Seller
+            </a>
+
+            {% if not listing.whatsapp_number and not listing.phone_number %}
+                <div class="alert alert-light border text-center small py-2 mb-0 mt-1">
+                    <i class="bi bi-info-circle me-1"></i> Seller did not provide phone numbers.
+                </div>
+            {% endif %}
 
                 <a href="{% url 'core:seller_profile' listing.seller.username %}" class="btn btn-light py-2.5 mt-2 d-flex align-items-center justify-content-center gap-2">
                     <i class="bi bi-shop"></i> View Seller Store

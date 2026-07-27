@@ -175,7 +175,7 @@
         /* Footer desktop */
         footer {
             margin-top: auto;
-            background-color: var(--dark-color);
+            background-color: var(--primary-color) !important;
             color: white;
         }
     </style>
@@ -300,7 +300,7 @@
     </main>
 
     <!-- Desktop Footer (Visible on large screens) -->
-    <footer class="desktop-footer py-5 d-none d-md-block">
+    <footer class="desktop-footer bg-primary-bu py-5 d-none d-md-block" style="background: linear-gradient(180deg, #003B8E 0%, #002b66 100%) !important;">
         <div class="container">
             <div class="row g-4">
                 <!-- Column 1: Brand -->
@@ -308,7 +308,7 @@
                     <a href="{% url 'core:home' %}" class="d-inline-block text-decoration-none mb-3">
                         <img src="{% static 'images/bu-market-logo2.png' %}" alt="BU-MARKET Logo" height="52" class="bg-white p-1.5 rounded-3 shadow-sm">
                     </a>
-                    <p class="text-white-50 small mb-3">
+                    <p class="text-white small mb-3 opacity-90">
                         The ultimate student-led community marketplace for Bugema University. Buy, sell, and connect commission-free.
                     </p>
                     <div class="d-flex gap-2">
@@ -321,90 +321,87 @@
                 
                 <!-- Column 2: Quick Links -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <h6 class="mb-3">Quick Links</h6>
+                    <h6 class="mb-3 text-white fw-bold">Quick Links</h6>
                     <ul class="list-unstyled mb-0">
-                        <li class="mb-2"><a href="{% url 'core:home' %}">Home</a></li>
-                        <li class="mb-2"><a href="{% url 'core:browse' %}">Browse Listings</a></li>
-                        <li class="mb-2"><a href="{% url 'accounts:register' %}">Start Selling</a></li>
-                        <li class="mb-2"><a href="{% url 'subscriptions:apply_buyer' %}">Buyer Membership</a></li>
+                        <li class="mb-2"><a href="{% url 'core:home' %}" class="text-white text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a href="{% url 'core:browse' %}" class="text-white text-decoration-none">Browse Listings</a></li>
+                        <li class="mb-2"><a href="{% url 'accounts:register' %}" class="text-white text-decoration-none">Sell on BU-MARKET</a></li>
                     </ul>
                 </div>
                 
                 <!-- Column 3: Categories -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <h6 class="mb-3">Categories</h6>
+                    <h6 class="mb-3 text-white fw-bold">Categories</h6>
                     <ul class="list-unstyled mb-0">
-                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=hostel-items">Hostel Items</a></li>
-                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=textbooks">Textbooks</a></li>
-                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=electronics">Electronics</a></li>
-                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=phones">Smartphones</a></li>
+                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=hostel-items" class="text-white text-decoration-none">Hostel Items</a></li>
+                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=textbooks" class="text-white text-decoration-none">Textbooks</a></li>
+                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=electronics" class="text-white text-decoration-none">Electronics</a></li>
+                        <li class="mb-2"><a href="{% url 'core:browse' %}?category=phones" class="text-white text-decoration-none">Smartphones</a></li>
                     </ul>
                 </div>
                 
-                <!-- Column 4: Contact / Help -->
+                <!-- Column 4: Contact / Technical Support -->
                 <div class="col-12 col-md-6 col-lg-4">
-                    <h6 class="mb-3">Technical Support</h6>
-                    <p class="small text-white-50 mb-2">
-                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> Bugema University Campus, Kampala, Uganda
+                    <h6 class="mb-3 text-white fw-bold">Technical Support</h6>
+                    <p class="small text-white mb-2 fw-medium">
+                        <i class="bi bi-geo-alt-fill text-warning me-1"></i> Bugema University Campus, Kampala, Uganda
                     </p>
-                    <p class="small text-white-50 mb-3">
-                        <i class="bi bi-patch-check-fill text-accent-bu me-1"></i> <strong>Excellence in Market</strong>
+                    <p class="small text-white mb-3 fw-medium">
+                        <i class="bi bi-patch-check-fill text-accent-bu me-1"></i> <span class="text-accent-bu fw-bold">Excellence in Market</span>
                     </p>
-                    <div class="p-3 rounded bg-white bg-opacity-5 border border-white border-opacity-10">
-                        <span class="d-block small text-white-50">Need assistance? Contact portal admin:</span>
-                        <a href="mailto:support@bumarket.com" class="fw-bold text-accent-bu small">support@bumarket.com</a>
+                    <!-- Crisp White High-Contrast Support Box -->
+                    <div class="p-3 rounded-3 bg-white text-dark shadow-sm border-0">
+                        <span class="d-block small text-dark fw-bold mb-1">Need assistance? Contact portal admin:</span>
+                        <a href="mailto:support@bumarket.com" class="fw-bold text-primary-bu text-decoration-none small d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-envelope-fill text-accent-bu"></i> support@bumarket.com
+                        </a>
                     </div>
                 </div>
             </div>
             
-            <hr class="my-4 border-white border-opacity-10">
+            <hr class="my-4 border-white border-opacity-25">
             
-            <div class="row align-items-center text-white-50">
-                <div class="col-md-6 text-center text-md-start small">
+            <div class="row align-items-center text-white">
+                <div class="col-md-6 text-center text-md-start small opacity-90">
                     &copy; 2026 BU-MARKET. Designed for Bugema University Community.<br>
-                    <span class="text-white-50 opacity-75" style="font-size: 0.8rem;">Developed by IT-Support in conjunction with the Inter students of 2026</span>
+                    <span class="opacity-75" style="font-size: 0.8rem;">Developed by IT-Support in conjunction with the Inter students of 2026</span>
                 </div>
                 <div class="col-md-6 text-center text-md-end small mt-2 mt-md-0">
-                    <a href="#" class="me-3">Terms of Use</a>
-                    <a href="#">Privacy Policy</a>
+                    <a href="#" class="me-3 text-white">Terms of Use</a>
+                    <a href="#" class="text-white">Privacy Policy</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Mobile Footer (Visible only on mobile/tablet screens) -->
-    <footer class="mobile-footer py-4 px-3 d-md-none text-center">
+    <!-- Ultra-Compact Mobile Footer (Sleek alternative for phone screens) -->
+    <footer class="mobile-footer bg-primary-bu py-3 px-3 d-md-none" style="background: #002b66 !important;">
         <div class="container">
-            <div class="d-flex justify-content-center align-items-center mb-2">
-                <img src="{% static 'images/bu-market-logo1.png' %}" alt="BU-MARKET Logo" height="40" class="rounded-2 shadow-sm border border-white border-opacity-25 me-2">
-                <span class="text-white fw-bold fs-5">BU-MARKET</span>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="{% static 'images/bu-market-logo1.png' %}" alt="BU-MARKET Logo" height="28" class="rounded-2 border border-white border-opacity-25">
+                    <span class="text-white fw-bold small" style="letter-spacing: 0.5px;">BU-MARKET</span>
+                    <span class="badge bg-white bg-opacity-10 text-accent-bu border border-warning border-opacity-25" style="font-size: 0.65rem;">Campus</span>
+                </div>
+                <div class="d-flex gap-2.5 align-items-center">
+                    <a href="mailto:support@bumarket.com" class="text-white-50 small text-decoration-none me-2">
+                        <i class="bi bi-envelope-fill text-accent-bu me-1"></i>Support
+                    </a>
+                    <a href="{% url 'core:home' %}" class="text-white-50 small text-decoration-none me-1">Home</a>
+                    <a href="{% url 'core:browse' %}" class="text-white-50 small text-decoration-none">Browse</a>
+                </div>
             </div>
-            <p class="text-muted small mb-3">Excellence in Market</p>
-            
-            <div class="d-flex justify-content-center gap-2 mb-3">
-                <a href="#" class="footer-social-icon"><i class="bi bi-facebook"></i></a>
-                <a href="#" class="footer-social-icon"><i class="bi bi-twitter-x"></i></a>
-                <a href="#" class="footer-social-icon"><i class="bi bi-whatsapp"></i></a>
-                <a href="mailto:support@bumarket.com" class="footer-social-icon"><i class="bi bi-envelope-fill"></i></a>
+            <div class="pt-2 border-top border-white border-opacity-10 d-flex justify-content-between align-items-center text-white-50" style="font-size: 0.7rem;">
+                <span>&copy; 2026 BU-MARKET &bull; Bugema University</span>
+                <span class="opacity-75">IT-Support 2026</span>
             </div>
-            
-            <div class="d-flex justify-content-center gap-3 flex-wrap small mb-3 text-white-50">
-                <a href="{% url 'core:home' %}">Home</a>
-                <span>&bull;</span>
-                <a href="{% url 'core:browse' %}">Browse</a>
-                <span>&bull;</span>
-                <a href="mailto:support@bumarket.com">Support</a>
-            </div>
-            
-            <small class="text-muted d-block">&copy; 2026 BU-MARKET. Campus Edition.</small>
-            <small class="text-muted d-block mt-1 opacity-75" style="font-size: 0.72rem;">Developed by IT-Support in conjunction with the Inter students of 2026</small>
         </div>
     </footer>
 
     <!-- Mobile Fixed Bottom Navigation Bar -->
     <div class="bottom-nav d-md-none">
         <a href="{% url 'core:home' %}"
-            class="bottom-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+            class="bottom-nav-item {% if request.resolver_match.url_name == 'home' and request.resolver_match.namespace != 'dashboard' %}active{% endif %}">
             <i class="bi bi-house-door-fill"></i>
             <span>Home</span>
         </a>
@@ -414,33 +411,29 @@
             <span>Browse</span>
         </a>
         {% if user.is_authenticated %}
-        {% if user.is_seller %}
-        <a href="{% url 'dashboard:create_listing' %}"
-            class="bottom-nav-item {% if request.resolver_match.url_name == 'create_listing' %}active{% endif %}">
-            <i class="bi bi-plus-circle-fill text-primary-bu"></i>
-            <span>Sell</span>
-        </a>
+            {% if user.is_seller %}
+            <a href="{% url 'dashboard:create_listing' %}"
+                class="bottom-nav-item {% if request.resolver_match.url_name == 'create_listing' %}active{% endif %}">
+                <i class="bi bi-plus-circle-fill text-primary-bu"></i>
+                <span>Sell</span>
+            </a>
+            {% endif %}
+            <a href="{% url 'dashboard:home' %}"
+                class="bottom-nav-item {% if request.resolver_match.url_name == 'home' and request.resolver_match.namespace == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-grid-fill"></i>
+                <span>Portal</span>
+            </a>
         {% else %}
-        <a href="{% url 'subscriptions:apply_buyer' %}"
-            class="bottom-nav-item {% if request.resolver_match.url_name == 'apply_buyer' %}active{% endif %}">
-            <i class="bi bi-award-fill text-primary-bu"></i>
-            <span>Membership</span>
-        </a>
-        {% endif %}
-        <a href="{% url 'dashboard:home' %}"
-            class="bottom-nav-item {% if request.resolver_match.url_name == 'home' and request.resolver_match.namespace == 'dashboard' %}active{% endif %}">
-            <i class="bi bi-grid-fill"></i>
-            <span>Portal</span>
-        </a>
-        {% else %}
-        <a href="{% url 'accounts:login' %}" class="bottom-nav-item">
-            <i class="bi bi-box-arrow-in-right"></i>
-            <span>Login</span>
-        </a>
-        <a href="{% url 'accounts:register' %}" class="bottom-nav-item">
-            <i class="bi bi-person-plus-fill"></i>
-            <span>Join</span>
-        </a>
+            <a href="{% url 'accounts:register' %}"
+                class="bottom-nav-item {% if request.resolver_match.url_name == 'register' %}active{% endif %}">
+                <i class="bi bi-shop text-primary-bu"></i>
+                <span>Sell</span>
+            </a>
+            <a href="{% url 'accounts:login' %}"
+                class="bottom-nav-item {% if request.resolver_match.url_name == 'login' %}active{% endif %}">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Login</span>
+            </a>
         {% endif %}
     </div>
 

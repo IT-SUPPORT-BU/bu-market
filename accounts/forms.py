@@ -3,22 +3,19 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import User
 
 class CustomUserCreationForm(UserCreationForm):
-    role = forms.ChoiceField(
-        choices=[
-            (User.Role.BUYER, 'Buyer — I want to browse and purchase items'),
-            (User.Role.SELLER, 'Seller — I want to list items for sale')
-        ],
-        required=True,
-        widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
-    )
+    """
+    Registration form for sellers only.
+    Buyers do not need to register — they can browse freely.
+    """
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'whatsapp_number', 'role')
+        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'whatsapp_number')
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.role = self.cleaned_data['role']
+        # All registrations are for sellers — buyers browse anonymously
+        user.role = User.Role.SELLER
         user.phone_number = self.cleaned_data.get('phone_number')
         user.whatsapp_number = self.cleaned_data.get('whatsapp_number')
         if commit:

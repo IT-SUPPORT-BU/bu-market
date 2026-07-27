@@ -70,15 +70,6 @@ class User(AbstractUser):
     )
 
     @property
-    def is_verified_buyer(self):
-        if self.is_superuser or self.role in [self.Role.ADMIN, self.Role.MODERATOR, self.Role.ACCOUNTANT]:
-            return True
-        try:
-            return self.buyer_membership.status == 'ACTIVE'
-        except AttributeError:
-            return False
-
-    @property
     def whatsapp_url(self):
         if not self.whatsapp_number:
             return None

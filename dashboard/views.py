@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 from marketplace.models import Listing, Category
 from marketplace.forms import ListingForm
-from subscriptions.models import SellerSubscription, BuyerMembership, SubscriptionPlan
+from subscriptions.models import SellerSubscription, SubscriptionPlan
 from accounts.models import User
 
 # Role verification decorators
@@ -32,7 +32,8 @@ def dashboard_home(request):
     elif user.role == User.Role.SELLER:
         return redirect('dashboard:seller_dashboard')
     elif user.role == User.Role.BUYER:
-        return redirect('dashboard:buyer_dashboard')
+        # Buyers don't have a dashboard — redirect to marketplace home
+        return redirect('core:home')
     return redirect('core:home')
 
 
@@ -113,26 +114,18 @@ def edit_listing(request, slug):
     return render(request, 'dashboard/listing_form.html', {'form': form, 'title': f'Edit "{listing.title}"'})
 
 
-@login_required
-@role_required([User.Role.BUYER])
-def buyer_dashboard(request):
-    # Check membership status
-    membership = getattr(request.user, 'buyer_membership', None)
-    context = {
-        'membership': membership,
-    }
-    return render(request, 'dashboard/buyer_dashboard.html', context)
+# buyer_dashboard removed — buyers browse anonymously without an account.
 
 
 @login_required
 @role_required([User.Role.ACCOUNTANT])
 def accountant_dashboard(request):
-    pending_subs = SellerSubscription.objects.filter(status=SellerSubscription.Status.PENDING).order_by('submitted_at')
-    pending_buyers = BuyerMembership.objects.filter(status=BuyerMembership.Status.PENDING).order_by('submitted_at')
-    
+    pending_subs = SellerSubscription.objects.filter(
+        status=SellerSubscription.Status.PENDING
+    ).order_by('submitted_at')
+
     context = {
         'pending_subs': pending_subs,
-        'pending_buyers': pending_buyers,
     }
     return render(request, 'dashboard/accountant_dashboard.html', context)
 

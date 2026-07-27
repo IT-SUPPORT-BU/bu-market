@@ -3,9 +3,134 @@
 {% block title %}Browse Listings | BU-MARKET{% endblock %}
 
 {% block content %}
+<!-- Mobile Single Search Bar & Quick Filter Launcher (Phone Screens Only) -->
+<div class="d-block d-lg-none mb-3">
+    <form action="{% url 'core:browse' %}" method="get" class="card border-0 shadow-sm p-2 rounded-pill bg-white">
+        {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
+        {% if request.GET.sort %}<input type="hidden" name="sort" value="{{ request.GET.sort }}">{% endif %}
+        
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center flex-grow-1 ps-2">
+                <i class="bi bi-search text-muted me-2 fs-5"></i>
+                <input type="text" name="q" class="form-control border-0 bg-transparent shadow-none py-1.5" 
+                       placeholder="Search textbooks, hostels, phones..." value="{{ request.GET.q }}" style="font-size: 0.9rem;">
+                {% if request.GET.q %}
+                    <a href="{% url 'core:browse' %}" class="btn text-muted p-0 me-2"><i class="bi bi-x-circle-fill"></i></a>
+                {% endif %}
+            </div>
+            <div class="d-flex gap-1 pe-1">
+                <button type="submit" class="btn btn-primary-bu rounded-pill px-3 py-1.5">
+                    <i class="bi bi-search"></i>
+                </button>
+                <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 border" 
+                        data-bs-toggle="offcanvas" data-bs-target="#mobileFilterOffcanvas" aria-controls="mobileFilterOffcanvas">
+                    <i class="bi bi-sliders text-primary-bu"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Active Filters Pills Bar on Mobile -->
+    {% if request.GET.q or request.GET.category or request.GET.location or request.GET.min_price or request.GET.max_price or request.GET.condition %}
+        <div class="d-flex align-items-center gap-1 mt-2 flex-wrap px-1">
+            <span class="small text-muted me-1" style="font-size: 0.75rem;">Active:</span>
+            {% if request.GET.q %}
+                <span class="badge bg-primary-bu bg-opacity-10 text-primary-bu border border-primary border-opacity-10 rounded-pill">"{{ request.GET.q }}"</span>
+            {% endif %}
+            {% if request.GET.category %}
+                <span class="badge bg-accent-bu text-dark rounded-pill">{{ request.GET.category }}</span>
+            {% endif %}
+            <a href="{% url 'core:browse' %}" class="small text-danger ms-auto text-decoration-none fw-semibold" style="font-size: 0.75rem;"><i class="bi bi-x-lg me-1"></i>Clear All</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Mobile Offcanvas Filter Drawer (Slide-up Panel for Mobile Users) -->
+<div class="offcanvas offcanvas-bottom rounded-top-4 d-lg-none" tabindex="-1" id="mobileFilterOffcanvas" style="height: 85vh;">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title fw-bold text-primary-bu"><i class="bi bi-funnel me-2"></i> Filter Marketplace</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-4">
+        <form action="{% url 'core:browse' %}" method="get">
+            <!-- Keyword search -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Search Keywords</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="q" class="form-control border-start-0" placeholder="What are you looking for?" value="{{ request.GET.q }}">
+                </div>
+            </div>
+
+            <!-- Category -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Category</label>
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Location -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Location</label>
+                <input type="text" name="location" class="form-control" placeholder="e.g. Hostel, Main Gate" value="{{ request.GET.location }}">
+            </div>
+
+            <!-- Price Range -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Price (UGX)</label>
+                <div class="row g-2">
+                    <div class="col">
+                        <input type="number" name="min_price" class="form-control" placeholder="Min" value="{{ request.GET.min_price }}">
+                    </div>
+                    <div class="col">
+                        <input type="number" name="max_price" class="form-control" placeholder="Max" value="{{ request.GET.max_price }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sort order -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Sort By</label>
+                <select name="sort" class="form-select">
+                    <option value="" {% if not request.GET.sort %}selected{% endif %}>Newest First</option>
+                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="oldest" {% if request.GET.sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                </select>
+            </div>
+
+            <!-- Condition -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Condition</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="condition" id="m_cond_any" value="" {% if not request.GET.condition %}checked{% endif %}>
+                    <label class="form-check-label" for="m_cond_any">Any Condition</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="condition" id="m_cond_new" value="NEW" {% if request.GET.condition == 'NEW' %}checked{% endif %}>
+                    <label class="form-check-label" for="m_cond_new">New</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="condition" id="m_cond_used" value="USED" {% if request.GET.condition == 'USED' %}checked{% endif %}>
+                    <label class="form-check-label" for="m_cond_used">Used</label>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 mb-3">
+                <button type="submit" class="btn btn-primary-bu py-2.5 rounded-pill fw-semibold">Apply Filters</button>
+                <a href="{% url 'core:browse' %}" class="btn btn-light py-2 rounded-pill">Reset All Filters</a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="row">
- 
-    <div class="col-lg-3 mb-4">
+    <!-- Desktop Filter Sidebar (Hidden on Phone Screens) -->
+    <div class="col-lg-3 mb-4 d-none d-lg-block">
         <div class="card border-0 shadow-sm p-4">
             <h4 class="fw-bold mb-4 d-flex align-items-center">
                 <i class="bi bi-funnel text-primary-bu me-2"></i> Filters
@@ -21,7 +146,6 @@
                     </div>
                 </div>
                 
-           
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Category</label>
                     <select name="category" class="form-select">
@@ -90,17 +214,17 @@
     
     <!-- Listings Grid -->
     <div class="col-lg-9">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold mb-0">Browse Marketplace</h3>
-            <span class="text-muted">{{ page_obj.paginator.count }} item(s) found</span>
+        <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4">
+            <h3 class="fw-bold mb-0 fs-4 fs-md-3">Browse Marketplace</h3>
+            <span class="text-muted small">{{ page_obj.paginator.count }} item(s) found</span>
         </div>
         
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="row row-cols-2 row-cols-md-2 row-cols-lg-3 g-2 g-md-4">
             {% for listing in listings %}
                 <div class="col">
-                    <div class="card h-100 listing-card border-0 position-relative">
+                    <div class="card h-100 listing-card border-0 position-relative shadow-sm">
                         {% if listing.is_promoted %}
-                            <span class="position-absolute top-0 end-0 bg-accent-bu text-dark px-3 py-1 fw-bold shadow-sm small" style="border-bottom-left-radius: 12px; z-index: 10;">
+                            <span class="position-absolute top-0 end-0 bg-accent-bu text-dark px-2.5 py-1 fw-bold shadow-sm" style="font-size: 0.68rem; border-bottom-left-radius: 10px; z-index: 10;">
                                 <i class="bi bi-lightning-fill"></i> PROMOTED
                             </span>
                         {% endif %}
@@ -116,18 +240,18 @@
                             {% endif %}
                         </div>
                         
-                        <div class="card-body d-flex flex-column p-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge {% if listing.is_promoted %}bg-primary-bu{% else %}bg-light text-dark border{% endif %} rounded-pill px-2 py-1">{{ listing.category.name }}</span>
-                                <span class="badge text-uppercase bg-light text-dark border rounded-pill px-2 py-1">{{ listing.get_condition_display }}</span>
+                        <div class="card-body d-flex flex-column p-2.5 p-md-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-1">
+                                <span class="badge {% if listing.is_promoted %}bg-primary-bu{% else %}bg-light text-dark border{% endif %} rounded-pill px-2 py-1" style="font-size: 0.7rem;">{{ listing.category.name }}</span>
+                                <span class="badge text-uppercase bg-light text-dark border rounded-pill px-2 py-1" style="font-size: 0.65rem;">{{ listing.get_condition_display }}</span>
                             </div>
                             
-                            <h5 class="card-title fw-bold text-truncate mb-1 text-dark" title="{{ listing.title }}">{{ listing.title }}</h5>
-                            <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ listing.location }}</p>
+                            <h5 class="card-title fw-bold text-truncate mb-1 text-dark fs-6" title="{{ listing.title }}">{{ listing.title }}</h5>
+                            <p class="text-muted small mb-2 mb-md-3 text-truncate" style="font-size: 0.75rem;"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ listing.location }}</p>
                             
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <span class="text-primary-bu fw-bold fs-5">{{ listing.price }} UGX</span>
-                                <a href="{% url 'core:listing_detail' listing.slug %}" class="btn {% if listing.is_promoted %}btn-primary-bu{% else %}btn-outline-primary-bu{% endif %} btn-sm px-3 rounded-pill">View Details</a>
+                            <div class="mt-auto d-flex justify-content-between align-items-center flex-wrap gap-1">
+                                <span class="text-primary-bu fw-bold fs-6 fs-md-5">{{ listing.price }} UGX</span>
+                                <a href="{% url 'core:listing_detail' listing.slug %}" class="btn {% if listing.is_promoted %}btn-primary-bu{% else %}btn-outline-primary-bu{% endif %} btn-sm px-2.5 py-1 rounded-pill" style="font-size: 0.78rem;">View</a>
                             </div>
                         </div>
                     </div>
@@ -136,15 +260,16 @@
                 <div class="col-12 text-center py-5 bg-white rounded-3 shadow-sm">
                     <i class="bi bi-search display-1 text-muted"></i>
                     <h4 class="fw-bold mt-3">No matching items found</h4>
-                    <p class="text-muted">Try adjusting your filters or search keywords.</p>
+                    <p class="text-muted">Try adjusting your search keywords or resetting filters.</p>
+                    <a href="{% url 'core:browse' %}" class="btn btn-primary-bu rounded-pill px-4 mt-2">View All Listings</a>
                 </div>
             {% endfor %}
         </div>
         
         <!-- Pagination -->
         {% if is_paginated %}
-            <nav class="my-5 d-flex justify-content-center">
-                <ul class="pagination">
+            <nav class="my-4 my-md-5 d-flex justify-content-center">
+                <ul class="pagination pagination-sm pagination-md-md">
                     {% if page_obj.has_previous %}
                         <li class="page-item">
                             <a class="page-link" href="?{{ query_string }}&page={{ page_obj.previous_page_number }}" aria-label="Previous">

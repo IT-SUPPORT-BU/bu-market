@@ -4,6 +4,133 @@
 {% block title %}Home | BU-MARKET{% endblock %}
 
 {% block content %}
+<!-- Hero Styles (Embedded for Guaranteed Instant Rendering) -->
+<style>
+    .hero-gradient {
+        background: linear-gradient(135deg, #003B8E 0%, #002b66 60%, #0f172a 100%) !important;
+        position: relative;
+    }
+
+    .hero-image-wrapper {
+        position: relative !important;
+        /* Sharp right edge — bleeds to hero container right border */
+        border-radius: 24px 0 0 24px !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-right: none !important;
+        background: #002b66 !important;
+        overflow: hidden !important;
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4) !important;
+        height: 420px !important;
+    }
+
+    .hero-seller-img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center 15% !important;
+        filter: brightness(0.92) contrast(1.08) saturate(1.05) !important;
+        display: block !important;
+    }
+
+    /* Ken Burns zoom animation on active slide */
+    @keyframes heroKenBurns {
+        0%   { transform: scale(1.0); }
+        100% { transform: scale(1.1); }
+    }
+
+    .carousel-item.active .hero-zoom-anim {
+        animation: heroKenBurns 4s ease-in-out forwards !important;
+    }
+
+    /* Smooth cross-fade transition */
+    #heroSellerCarousel .carousel-item {
+        transition: opacity 0.85s ease-in-out !important;
+    }
+
+    /* Left Fadeout Gradient Overlay */
+    .hero-image-overlay-left {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: 52% !important;
+        background: linear-gradient(to right, #003B8E 0%, rgba(0, 59, 142, 0.88) 38%, rgba(0, 59, 142, 0) 100%) !important;
+        z-index: 10 !important;
+        pointer-events: none !important;
+    }
+
+    /* Bottom Fadeout Gradient Overlay */
+    .hero-image-overlay-bottom {
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        height: 35% !important;
+        background: linear-gradient(to top, rgba(0, 43, 102, 0.95) 0%, rgba(0, 43, 102, 0) 100%) !important;
+        z-index: 10 !important;
+        pointer-events: none !important;
+    }
+
+    /* Floating Glass Trust Badges */
+    .floating-hero-badge {
+        position: absolute !important;
+        z-index: 20 !important;
+        background: rgba(15, 23, 42, 0.88) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        color: #ffffff !important;
+        padding: 8px 16px !important;
+        border-radius: 50px !important;
+        font-size: 0.8rem !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+    }
+    .floating-hero-badge.badge-top-right {
+        top: 20px !important;
+        right: 20px !important;
+    }
+    .floating-hero-badge.badge-bottom-left {
+        bottom: 20px !important;
+        left: 20px !important;
+    }
+
+    .slogan-badge {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        padding: 6px 16px !important;
+        border-radius: 50px !important;
+        font-size: 0.82rem !important;
+    }
+
+    .search-hero-form {
+        background: #ffffff !important;
+        border-radius: 50px !important;
+        padding: 4px !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* Carousel dot indicators style override */
+    #heroSellerCarousel .carousel-indicators [data-bs-target] {
+        width: 8px !important;
+        height: 8px !important;
+        border-radius: 50% !important;
+        background-color: rgba(255,255,255,0.55) !important;
+        border: none !important;
+        transition: background-color 0.3s ease !important;
+    }
+    #heroSellerCarousel .carousel-indicators .active {
+        background-color: #FFD700 !important;
+        width: 22px !important;
+        border-radius: 4px !important;
+    }
+</style>
+
 <!-- Hero Section (Desktop/Tablet View) -->
 <div class="d-none d-md-block p-4 p-md-5 mb-5 text-white rounded-4 overflow-hidden hero-gradient shadow-lg">
     <!-- Blurred Decorative Background Blobs -->
@@ -13,7 +140,7 @@
     </div>
     
     <div class="row align-items-center py-2 py-md-4 position-relative" style="z-index: 2;">
-        <div class="col-lg-7 text-center text-lg-start">
+        <div class="col-lg-12 text-center text-lg-start">
             <!-- Excellence in Market Slogan Badge -->
             <div class="slogan-badge mb-3 animate-pulse-glow">
                 <i class="bi bi-patch-check-fill text-accent-bu"></i>
@@ -46,7 +173,7 @@
                 </a>
                 {% if not user.is_authenticated %}
                     <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-lg px-4 py-2.5 rounded-pill">
-                        <i class="bi bi-shop me-2"></i>Start Selling
+                        <i class="bi bi-shop me-2"></i>Sell on BU-MARKET
                     </a>
                 {% elif user.is_seller %}
                     <a href="{% url 'dashboard:create_listing' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill shadow-sm">
@@ -55,31 +182,41 @@
                 {% endif %}
             </div>
         </div>
-        
-        <!-- Animated Stat Graphics for Larger Screens -->
-        <div class="col-lg-5 d-none d-lg-block text-end mt-4 mt-lg-0">
-            <div class="row g-3 justify-content-end" style="max-width: 420px; margin-left: auto;">
-                <div class="col-12 text-center mb-1">
-                    <div class="hero-stat-card animate-float shadow bg-white p-3 rounded-4 d-inline-block w-100">
-                        <img src="{% static 'images/bu-market-logo2.png' %}" alt="BU-MARKET Logo" style="max-height: 105px; width: auto;">
-                    </div>
+        <!--
+        HERO IMAGE COLUMN (commented out — uncomment when real campus photos are ready)
+        <div class="col-lg-5 d-none d-lg-block mt-4 mt-lg-0 pe-0 position-relative" style="margin-right: -1.5rem; padding-right: 0 !important;">
+            <div class="hero-image-wrapper shadow-lg">
+                <div class="hero-image-overlay-left"></div>
+                <div class="hero-image-overlay-bottom"></div>
+                <div class="floating-hero-badge badge-top-right animate-float">
+                    <i class="bi bi-shield-check text-accent-bu fs-6"></i>
+                    <span class="fw-bold">100% Campus Verified</span>
                 </div>
-                <div class="col-6">
-                    <div class="hero-stat-card animate-float shadow">
-                        <i class="bi bi-shield-check text-accent-bu fs-3 mb-2 d-block"></i>
-                        <div class="fw-bold fs-5">100% Safe</div>
-                        <div class="small text-white-50">Campus Verified</div>
-                    </div>
+                <div class="floating-hero-badge badge-bottom-left animate-float-reverse" style="animation-delay: 1.2s;">
+                    <i class="bi bi-lightning-charge-fill text-accent-bu fs-6"></i>
+                    <span class="fw-bold">Fast WhatsApp Deals</span>
                 </div>
-                <div class="col-6">
-                    <div class="hero-stat-card animate-float-reverse shadow" style="animation-delay: 1s;">
-                        <i class="bi bi-lightning-charge text-accent-bu fs-3 mb-2 d-block"></i>
-                        <div class="fw-bold fs-5">Fast Deals</div>
-                        <div class="small text-white-50">WhatsApp / Call</div>
+                <div id="heroSellerCarousel" class="carousel slide carousel-fade h-100" data-bs-ride="carousel" data-bs-interval="3800">
+                    <div class="carousel-inner h-100">
+                        <div class="carousel-item active h-100">
+                            <img src="{% static 'images/hero_seller_1.png' %}" alt="BU student selling laptop" class="hero-seller-img hero-zoom-anim">
+                        </div>
+                        <div class="carousel-item h-100">
+                            <img src="{% static 'images/hero_seller_2.png' %}" alt="BU student selling textbooks" class="hero-seller-img hero-zoom-anim">
+                        </div>
+                        <div class="carousel-item h-100">
+                            <img src="{% static 'images/hero_seller_3.png' %}" alt="BU student selling household items" class="hero-seller-img hero-zoom-anim">
+                        </div>
+                    </div>
+                    <div class="carousel-indicators" style="bottom: 62px; z-index: 15;">
+                        <button type="button" data-bs-target="#heroSellerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#heroSellerCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#heroSellerCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
                     </div>
                 </div>
             </div>
         </div>
+        END HERO IMAGE COLUMN -->
     </div>
 </div>
 
@@ -141,35 +278,254 @@
         </a>
       {% elif not user.is_authenticated %}
         <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-sm px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">
-          <i class="bi bi-person-plus-fill me-1"></i> Join Free
+          <i class="bi bi-shop me-1"></i> Sell Here
         </a>
       {% endif %}
     </div>
   </div>
 </div>
 
-<!-- Categories Section -->
-<div class="my-5">
-  <h3 class="fw-bold mb-4 d-flex align-items-center">
-    <i class="bi bi-grid-fill text-primary-bu me-2"></i> Browse Categories
-  </h3>
-  <div class="row g-2 g-md-3 row-cols-3 row-cols-md-6 justify-content-center">
-    {% for category in categories %}
-      <a href="{% url 'core:browse' %}?category={{ category.slug }}" class="card text-center p-3 h-100 text-decoration-none border-0 shadow-sm" style="transition: transform 0.2s;">
-        <div class="card-body p-0 d-flex flex-column align-items-center justify-content-center">
-          <div class="rounded-circle overflow-hidden mx-auto" style="width:60px;height:60px;">
+<!-- Categories Section (Guaranteed Single Row Carousel with Left/Right Clickable Arrows) -->
+<style>
+  .category-track-container {
+    position: relative;
+    width: 100%;
+    margin: 1.5rem 0;
+  }
+
+  .category-scroll-track {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch;
+    gap: 16px;
+    padding: 10px 5px 15px 5px;
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE 10+ */
+  }
+
+  .category-scroll-track::-webkit-scrollbar {
+    display: none !important; /* Chrome / Safari / Opera */
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .category-item-card {
+    flex: 0 0 135px !important;
+    width: 135px !important;
+    max-width: 135px !important;
+    min-width: 135px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    padding: 18px 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .category-item-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 22px rgba(0, 59, 142, 0.15) !important;
+    border-color: #003B8E !important;
+    background: #ffffff !important;
+  }
+
+  .category-icon-circle {
+    width: 58px !important;
+    height: 58px !important;
+    border-radius: 50% !important;
+    background: #f1f5f9 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 10px !important;
+    overflow: hidden !important;
+    color: #003B8E !important;
+    font-size: 1.6rem !important;
+    transition: transform 0.25s ease !important;
+  }
+
+  .category-item-card:hover .category-icon-circle {
+    transform: scale(1.1) !important;
+    background: #e0e7ff !important;
+  }
+
+  .category-icon-circle img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .category-item-name {
+    color: #1e293b !important;
+    font-weight: 600 !important;
+    font-size: 0.82rem !important;
+    text-align: center !important;
+    width: 100% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Navigation Arrow Buttons */
+  .btn-scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #003B8E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.1rem;
+    outline: none;
+  }
+
+  .btn-scroll-arrow:hover {
+    background: #003B8E;
+    color: #ffffff;
+    border-color: #003B8E;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 8px 20px rgba(0, 59, 142, 0.3);
+  }
+
+  .btn-scroll-arrow.arrow-left {
+    left: -18px;
+  }
+
+  .btn-scroll-arrow.arrow-right {
+    right: -18px;
+  }
+
+  .header-nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #003B8E;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  .header-nav-btn:hover {
+    background: #003B8E;
+    color: #ffffff;
+    border-color: #003B8E;
+  }
+
+  /* Phone Screen Optimizations */
+  @media (max-width: 767.98px) {
+    .category-item-card {
+      flex: 0 0 98px !important;
+      width: 98px !important;
+      max-width: 98px !important;
+      min-width: 98px !important;
+      padding: 12px 6px !important;
+      border-radius: 14px !important;
+    }
+
+    .category-icon-circle {
+      width: 48px !important;
+      height: 48px !important;
+      font-size: 1.3rem !important;
+      margin-bottom: 6px !important;
+    }
+
+    .category-item-name {
+      font-size: 0.75rem !important;
+    }
+
+    .category-scroll-track {
+      gap: 10px !important;
+      padding: 5px 0 10px 0 !important;
+    }
+  }
+</style>
+
+<div class="my-5 position-relative">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="fw-bold mb-0 d-flex align-items-center">
+        <i class="bi bi-grid-fill text-primary-bu me-2"></i> Browse Categories
+      </h3>
+      <small class="text-muted d-block d-md-none mt-1" style="font-size: 0.75rem;">
+        <i class="bi bi-hand-index-thumb me-1 text-accent-bu"></i> Swipe left or right to explore
+      </small>
+    </div>
+
+    <!-- Desktop Navigation Arrow Buttons in Header -->
+    <div class="d-none d-md-flex gap-2 align-items-center">
+      <button type="button" class="header-nav-btn" onclick="scrollCatTrack(-1)" aria-label="Scroll left" title="Previous categories">
+        <i class="bi bi-chevron-left fs-6"></i>
+      </button>
+      <button type="button" class="header-nav-btn" onclick="scrollCatTrack(1)" aria-label="Scroll right" title="Next categories">
+        <i class="bi bi-chevron-right fs-6"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Single-Row Track Wrapper -->
+  <div class="category-track-container">
+    <!-- Side Arrow Left (Desktop / Large Screens) -->
+    <button type="button" class="btn-scroll-arrow arrow-left d-none d-lg-flex" onclick="scrollCatTrack(-1)" aria-label="Scroll left">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <!-- Horizontal Category Scroll Track -->
+    <div class="category-scroll-track" id="catScrollTrack">
+      {% for category in categories %}
+        <a href="{% url 'core:browse' %}?category={{ category.slug }}" class="category-item-card">
+          <div class="category-icon-circle">
             {% if category.image %}
-              <img src="{{ category.image.url }}" alt="{{ category.name }}" style="width:100%;height:100%;object-fit:cover;">
+              <img src="{{ category.image.url }}" alt="{{ category.name }}">
             {% else %}
-              <div class="bg-light w-100 h-100"></div>
+              <i class="bi {{ category.icon|default:'bi-tag-fill' }}"></i>
             {% endif %}
           </div>
-          <span class="text-dark small fw-semibold text-truncate w-100">{{ category.name }}</span>
-        </div>
-      </a>
-    {% endfor %}
+          <span class="category-item-name">{{ category.name }}</span>
+        </a>
+      {% endfor %}
+    </div>
+
+    <!-- Side Arrow Right (Desktop / Large Screens) -->
+    <button type="button" class="btn-scroll-arrow arrow-right d-none d-lg-flex" onclick="scrollCatTrack(1)" aria-label="Scroll right">
+      <i class="bi bi-chevron-right"></i>
+    </button>
   </div>
 </div>
+
+<script>
+  function scrollCatTrack(direction) {
+    const track = document.getElementById('catScrollTrack');
+    if (track) {
+      const scrollDistance = track.clientWidth * 0.75;
+      track.scrollBy({ left: direction * scrollDistance, behavior: 'smooth' });
+    }
+  }
+</script>
+
+
 
 
 <!-- Why BU-MARKET? Features Section (Desktop/Tablet View) -->
@@ -397,16 +753,22 @@
     </div>
     <div class="py-4 position-relative" style="z-index: 2;">
         <h2 class="display-6 fw-bold mb-3">Ready to sell your hostel items or textbooks?</h2>
-        <p class="fs-5 text-white-50 col-md-8 mx-auto mb-4">Join thousands of students and campus sellers at Bugema University. List your products and start receiving WhatsApp calls in minutes!</p>
+        <p class="fs-5 text-white-50 col-md-8 mx-auto mb-4">
+            Join campus sellers at Bugema University. List your products for free and start receiving WhatsApp buyer contacts in minutes!
+        </p>
         <div class="d-flex justify-content-center gap-3 flex-wrap">
             {% if not user.is_authenticated %}
-                <a href="{% url 'accounts:register' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold shadow-sm">Get Started Now</a>
-                <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold">Login</a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold shadow-sm">
+                    <i class="bi bi-shop me-2"></i>Start Selling Free
+                </a>
+                <a href="{% url 'core:browse' %}" class="btn btn-outline-light btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold">
+                    <i class="bi bi-search me-2"></i>Browse Listings
+                </a>
             {% elif user.is_seller %}
                 <a href="{% url 'dashboard:create_listing' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold shadow-sm">Post a New Listing</a>
                 <a href="{% url 'dashboard:home' %}" class="btn btn-outline-light btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold">Seller Dashboard</a>
             {% else %}
-                <a href="{% url 'core:browse' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold shadow-sm">Start Browsing</a>
+                <a href="{% url 'core:browse' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill text-uppercase fw-bold shadow-sm">Browse Listings</a>
             {% endif %}
         </div>
     </div>
