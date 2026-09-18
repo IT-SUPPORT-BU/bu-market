@@ -3,10 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
-from marketplace.models import Listing, Category
-from marketplace.forms import ListingForm
 from subscriptions.models import SellerSubscription, SubscriptionPlan
 from accounts.models import User
+from marketplace.forms import ListingForm, HostelForm
+from marketplace.models import Listing, Category, Hostel, HostelImage
 
 # Role verification decorators
 def role_required(allowed_roles):
@@ -94,6 +94,33 @@ def create_listing(request):
     
     return render(request, 'dashboard/listing_form.html', {'form': form, 'title': 'Create Listing'})
 
+@login_required
+@role_required([User.Role.SELLER])
+def create_hostel(request):
+    if not request.user.has_active_subscription:
+        messages.error(request, "You must have an active approved subscription to post a hostel.")
+        return redirect('dashboard:seller_dashboard')
+
+    if request.method == 'POST':
+        form = HostelForm(request.POST, request.FILES, user=request.user)
+        if form.is_valid():
+            hostel = form.save(commit=False)
+            hostel.owner = request.user
+            hostel.save()
+
+            for field_name in ['image_1', 'image_2', 'image_3', 'image_4']:
+                uploaded_image = form.cleaned_data.get(field_name)
+                if uploaded_image:
+                    HostelImage.objects.create(hostel=hostel, image=uploaded_image)
+
+            messages.success(request, f'Hostel "{hostel.name}" posted successfully!')
+            return redirect('dashboard:seller_dashboard')
+    else:
+        form = HostelForm(user=request.user)
+
+    return render(request, 'dashboard/hostel_form.html', {'form': form, 'title': 'Post a Hostel'})
+
+
 
 @login_required
 @role_required([User.Role.SELLER])
@@ -134,8 +161,10 @@ def accountant_dashboard(request):
 @role_required([User.Role.MODERATOR])
 def moderator_dashboard(request):
     pending_listings = Listing.objects.filter(status=Listing.Status.PENDING).order_by('created_at')
+    pending_hostels = Hostel.objects.filter(status=Hostel.Status.PENDING).order_by('created_at')
     context = {
         'pending_listings': pending_listings,
+        'pending_hostels': pending_hostels,
     }
     return render(request, 'dashboard/moderator_dashboard.html', context)
 

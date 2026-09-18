@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ hostel.name }} | BU-MARKET{% endblock %}
+
+{% block content %}
+<div class="my-4">
+    <a href="{% url 'core:hostel_list' %}" class="text-primary-bu text-decoration-none fw-semibold d-inline-block mb-3">
+        <i class="bi bi-arrow-left me-1"></i> Back to Hostels
+    </a>
+
+    <div class="row g-4">
+        <!-- Images -->
+        <div class="col-lg-7">
+            <div class="row g-2">
+                {% for hostel_image in hostel.images.all %}
+                    <div class="col-6">
+                        <img src="{{ hostel_image.image.url }}" class="w-100 rounded-3 shadow-sm" style="height: 220px; object-fit: cover;" alt="{{ hostel.name }}">
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="placeholder-image-gradient text-muted rounded-3" style="height: 300px;">
+                            <i class="bi bi-image fs-1 mb-1"></i>
+                            <span class="small">No Images Available</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Details -->
+        <div class="col-lg-5">
+            <div class="bg-white rounded-4 shadow-sm p-4">
+                <h2 class="fw-bold mb-2">{{ hostel.name }}</h2>
+                <p class="text-muted mb-3">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ hostel.location }}
+                </p>
+                <h3 class="text-primary-bu fw-bold mb-4">{{ hostel.price }} UGX</h3>
+
+                {% if hostel.description %}
+                    <h6 class="fw-semibold">Additional Information</h6>
+                    <p class="text-muted mb-4">{{ hostel.description }}</p>
+                {% endif %}
+
+                <div class="d-flex gap-2 flex-wrap">
+                    {% if hostel.whatsapp_url %}
+                        <a href="{{ hostel.whatsapp_url }}" target="_blank" class="btn btn-success flex-fill">
+                            <i class="bi bi-whatsapp me-1"></i> WhatsApp
+                        </a>
+                    {% endif %}
+                    {% if hostel.phone_number %}
+                        <a href="tel:{{ hostel.phone_number }}" class="btn btn-outline-primary-bu flex-fill">
+                            <i class="bi bi-telephone-fill me-1"></i> Call
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
