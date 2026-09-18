@@ -49,7 +49,7 @@ def approve_seller_subscription(request, pk):
     sub.status = SellerSubscription.Status.APPROVED
     sub.approved_by = request.user
     sub.approved_at = timezone.now()
-    sub.expires_at = timezone.now() + timedelta(days=30)
+    sub.expires_at = timezone.now() + timedelta(days=sub.plan.duration_days)
     sub.save()
     messages.success(request, f"Approved subscription for seller {sub.seller.username}.")
     return redirect('dashboard:accountant_dashboard')

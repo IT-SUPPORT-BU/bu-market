@@ -78,6 +78,10 @@ class Listing(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
+    is_quick_sale = models.BooleanField(default=False)
+    quick_sale_expires_at = models.DateTimeField(null=True, blank=True)
+
     @property
     def whatsapp_url(self):
         if not self.whatsapp_number:
@@ -137,4 +141,89 @@ class Listing(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# this is the hostel thing for the database 
+
+class Hostel(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'Pending Moderation'
+        ACTIVE = 'ACTIVE', 'Active'
+        REJECTED = 'REJECTED', 'Rejected'
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='hostels'
+    )
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
+    location = models.CharField(max_length=150)
+    price = models.DecimalField(max_digits=12, decimal_places=2)
+    description = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Optional extra info about the hostel"
+    )
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    whatsapp_number = models.CharField(max_length=20, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    removal_reason = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def whatsapp_url(self):
+        if not self.whatsapp_number:
+            return None
+        cleaned = "".join(c for c in self.whatsapp_number if c.isdigit())
+        if cleaned.startswith('0'):
+            cleaned = '256' + cleaned[1:]
+        return f"https://wa.me/{cleaned}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+            while Hostel.objects.filter(slug=slug).exclude(id=self.id).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if not self.owner.is_seller:
+            raise ValidationError("Only users with the SELLER role can post hostels.")
+        if not self.owner.has_active_subscription:
+            raise ValidationError("You must have an active approved subscription to post a hostel.")
+
+    def __str__(self):
+        return self.name
+
+
+class HostelImage(models.Model):
+    hostel = models.ForeignKey(
+        Hostel,
+        on_delete=models.CASCADE,
+        related_name='images'
+    )
+    image = models.ImageField(
+        upload_to='hostels/',
+        validators=[validate_file_size]
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        if self.hostel_id:
+            existing_count = HostelImage.objects.filter(hostel=self.hostel).exclude(pk=self.pk).count()
+            if existing_count >= 4:
+                raise ValidationError("A hostel can have a maximum of 4 images.")
+
+    def __str__(self):
+        return f"Image for {self.hostel.name}"
+
+
+
 

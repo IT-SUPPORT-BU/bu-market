@@ -18,49 +18,35 @@
     <link rel="icon" type="image/png" href="{% static 'images/bu-market-logo1.png' %}">
 
     <style>
-        :root {
-            --primary-color: #003B8E;
-            /* Bugema Blue */
-            --accent-color: #D4AF37;
-            /* Gold */
-            --dark-color: #1A1D20;
-            --light-color: #F8F9FA;
+    :root {
+            --primary-color: #0D6EFD;      /* Bright, confident blue — main brand */
+            --primary-dark: #0B5ED7;       /* Darker blue for hover states */
+            --dark-color: #1F2937;         /* Charcoal — secondary bar, footer base */
+            --dark-darker: #111827;        /* Slightly deeper charcoal for gradient/hover */
+            --light-bg: #EEF3FA;           /* Soft blue-tinted section background */
+            --text-color: #1A1D20;
             --gray-color: #6C757D;
+            --white: #FFFFFF;
         }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: #f4f6f9;
-            color: var(--dark-color);
+            background-color: var(--light-bg);
+            color: var(--text-color);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             padding-bottom: 70px;
-            /* Space for bottom nav on mobile */
         }
 
         @media (min-width: 768px) {
-            body {
-                padding-bottom: 0;
-            }
+            body { padding-bottom: 0; }
         }
 
         /* Color Utility Classes */
-        .bg-primary-bu {
-            background-color: var(--primary-color) !important;
-        }
-
-        .text-primary-bu {
-            color: var(--primary-color) !important;
-        }
-
-        .bg-accent-bu {
-            background-color: var(--accent-color) !important;
-        }
-
-        .text-accent-bu {
-            color: var(--accent-color) !important;
-        }
+        .bg-primary-bu { background-color: var(--primary-color) !important; }
+        .text-primary-bu { color: var(--primary-color) !important; }
+        .bg-dark-bu { background-color: var(--dark-color) !important; }
 
         /* Custom Buttons */
         .btn-primary-bu {
@@ -69,37 +55,31 @@
             border: none;
             transition: all 0.3s ease;
         }
-
         .btn-primary-bu:hover {
-            background-color: #002b66;
+            background-color: var(--primary-dark);
             color: white;
             transform: translateY(-1px);
         }
 
+        /* Accent button now uses charcoal instead of gold — calm, minimal, no competing color */
         .btn-accent-bu {
-            background-color: var(--accent-color);
-            color: var(--dark-color);
+            background-color: var(--dark-color);
+            color: white;
             border: none;
             font-weight: 500;
             transition: all 0.3s ease;
         }
-
         .btn-accent-bu:hover {
-            background-color: #bfa032;
-            color: var(--dark-color);
+            background-color: var(--dark-darker);
+            color: white;
             transform: translateY(-1px);
         }
 
-        /* Navigation styling */
-        .navbar-brand img {
-            height: 40px;
-        }
+        .text-accent-bu { color: var(--primary-color) !important; }
 
-        .navbar {
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+        .navbar-brand img { height: 40px; }
+        .navbar { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); }
 
-        /* Listing card hover effects */
         .listing-card {
             border: none;
             border-radius: 12px;
@@ -107,27 +87,21 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
         }
-
         .listing-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.10);
         }
 
-        /* Large tap targets for mobile friendliness */
-        .nav-link,
-        .btn {
+        .nav-link, .btn {
             min-height: 44px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Mobile Bottom Nav Bar */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             height: 65px;
             background-color: white;
             border-top: 1px solid #dee2e6;
@@ -137,7 +111,6 @@
             z-index: 1030;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
         }
-
         .bottom-nav-item {
             display: flex;
             flex-direction: column;
@@ -150,32 +123,15 @@
             height: 100%;
             transition: color 0.2s ease;
         }
+        .bottom-nav-item i { font-size: 1.4rem; margin-bottom: 2px; }
+        .bottom-nav-item.active, .bottom-nav-item:hover { color: var(--primary-color); }
 
-        .bottom-nav-item i {
-            font-size: 1.4rem;
-            margin-bottom: 2px;
-        }
+        .badge-silver { background-color: #C0C0C0; color: #333; }
+        .badge-gold { background-color: var(--primary-color); color: white; } /* was yellow, now brand blue */
 
-        .bottom-nav-item.active,
-        .bottom-nav-item:hover {
-            color: var(--primary-color);
-        }
-
-        /* Badges styling */
-        .badge-silver {
-            background-color: #C0C0C0;
-            color: #333;
-        }
-
-        .badge-gold {
-            background-color: #FFD700;
-            color: #333;
-        }
-
-        /* Footer desktop */
         footer {
             margin-top: auto;
-            background-color: var(--primary-color) !important;
+            background-color: var(--dark-color) !important;
             color: white;
         }
     </style>
@@ -300,7 +256,7 @@
     </main>
 
     <!-- Desktop Footer (Visible on large screens) -->
-    <footer class="desktop-footer bg-primary-bu py-5 d-none d-md-block" style="background: linear-gradient(180deg, #003B8E 0%, #002b66 100%) !important;">
+    <footer class="desktop-footer bg-primary-bu py-5 d-none d-md-block" style="background: var(--dark-color) !important;">
         <div class="container">
             <div class="row g-4">
                 <!-- Column 1: Brand -->
