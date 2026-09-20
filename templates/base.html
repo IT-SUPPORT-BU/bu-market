@@ -180,6 +180,19 @@
                 <span class="fw-bold tracking-wide">BU-MARKET</span>
             </a>
 
+            <!-- Location Switcher Pill (Visible on both desktop & mobile) -->
+            <button type="button" class="btn btn-outline-light btn-sm rounded-pill d-flex align-items-center px-2.5 px-md-3 py-1 me-auto ms-2" data-bs-toggle="modal" data-bs-target="#communityModal" title="Change Campus or Town Hub" style="border-color: rgba(255,255,255,0.35); font-size: 0.8rem; background: rgba(255,255,255,0.08);">
+                <i class="bi bi-geo-alt-fill text-warning me-1.5 fs-6"></i>
+                <span class="fw-semibold text-truncate" style="max-width: 140px;">
+                    {% if community_scope == 'all' %}
+                        All Uganda
+                    {% else %}
+                        {{ active_community.name }}
+                    {% endif %}
+                </span>
+                <i class="bi bi-chevron-down ms-1.5 text-white-50" style="font-size: 0.65rem;"></i>
+            </button>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -192,6 +205,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-white" href="{% url 'core:browse' %}">Browse Listings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'core:hostel_list' %}">Hostels & Rentals</a>
                     </li>
                 </ul>
 
@@ -423,6 +439,157 @@
             </a>
         {% endif %}
     </div>
+
+    <!-- Community & Campus Switcher Modal -->
+    <div class="modal fade" id="communityModal" tabindex="-1" aria-labelledby="communityModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Modal Header -->
+                <div class="modal-header bg-primary-bu text-white px-4 py-3 border-0">
+                    <div>
+                        <h5 class="modal-title fw-bold d-flex align-items-center mb-1" id="communityModalLabel">
+                            <i class="bi bi-geo-alt-fill text-warning me-2 fs-5"></i> Choose Your Campus or Town Hub
+                        </h5>
+                        <p class="small text-white-50 mb-0">Switch between universities or towns to view hyper-local listings, or browse nationwide.</p>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4 bg-light">
+                    <!-- Nationwide Scope Toggle Banner -->
+                    <div class="card border-0 shadow-sm p-3 mb-3 rounded-3 {% if community_scope == 'all' %}bg-primary text-white{% else %}bg-white text-dark{% endif %}">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: {% if community_scope == 'all' %}rgba(255,255,255,0.2){% else %}#eef2ff{% endif %};">
+                                    <i class="bi bi-globe2 fs-4 {% if community_scope == 'all' %}text-warning{% else %}text-primary-bu{% endif %}"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold fs-6">All Uganda (Nationwide)</div>
+                                    <div class="small {% if community_scope == 'all' %}text-white-50{% else %}text-muted{% endif %}">Explore marketplace listings and hostels across all campuses & towns</div>
+                                </div>
+                            </div>
+                            <div>
+                                {% if community_scope == 'all' %}
+                                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Active Mode
+                                    </span>
+                                {% else %}
+                                    <a href="{% url 'core:switch_community' slug='all' %}?scope=all" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
+                                        Switch to Nationwide
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Filter Search Box -->
+                    <div class="mb-3">
+                        <div class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden">
+                            <span class="input-group-text bg-white border-0 text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" id="communitySearchInput" class="form-control border-0 bg-white" placeholder="Search campus or town (e.g. Bugema, Makerere, Gayaza, Mukono)..." onkeyup="filterCommunities()" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- Hub Type Tabs -->
+                    <ul class="nav nav-pills mb-3 gap-2" id="communityTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active rounded-pill px-3 py-1.5 fw-semibold" id="campuses-tab" data-bs-toggle="pill" data-bs-target="#campuses-pane" type="button" role="tab">
+                                <i class="bi bi-mortarboard-fill me-1"></i> Universities & Campuses ({{ campus_communities|length }})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill px-3 py-1.5 fw-semibold" id="towns-tab" data-bs-toggle="pill" data-bs-target="#towns-pane" type="button" role="tab">
+                                <i class="bi bi-buildings-fill me-1"></i> Towns & Commercial Hubs ({{ town_communities|length }})
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Universities Pane -->
+                        <div class="tab-pane fade show active" id="campuses-pane" role="tabpanel">
+                            <div class="row g-2" id="campusListGrid">
+                                {% for comm in campus_communities %}
+                                    <div class="col-md-6 community-hub-item" data-search-text="{{ comm.name }} {{ comm.region }} {{ comm.city }}">
+                                        <a href="{% url 'core:switch_community' slug=comm.slug %}?scope=community" class="card h-100 p-3 text-decoration-none border-0 shadow-sm rounded-3 transition-card {% if active_community.id == comm.id and community_scope != 'all' %}border-2 border-warning bg-white shadow{% else %}bg-white text-dark hover-lift{% endif %}">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center gap-2.5">
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-light text-primary-bu" style="width: 40px; height: 40px;">
+                                                        <i class="bi {{ comm.icon|default:'bi-mortarboard' }} fs-5 text-primary-bu"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark mb-0 fs-6">{{ comm.name }}</div>
+                                                        <div class="small text-muted"><i class="bi bi-geo-alt me-1 text-danger"></i>{{ comm.region }}</div>
+                                                    </div>
+                                                </div>
+                                                {% if active_community.id == comm.id and community_scope != 'all' %}
+                                                    <span class="badge bg-warning text-dark rounded-pill px-2.5 py-1 fw-bold small">
+                                                        <i class="bi bi-check2"></i> Active Hub
+                                                    </span>
+                                                {% else %}
+                                                    <i class="bi bi-chevron-right text-muted small"></i>
+                                                {% endif %}
+                                            </div>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Towns Pane -->
+                        <div class="tab-pane fade" id="towns-pane" role="tabpanel">
+                            <div class="row g-2" id="townListGrid">
+                                {% for comm in town_communities %}
+                                    <div class="col-md-6 community-hub-item" data-search-text="{{ comm.name }} {{ comm.region }} {{ comm.city }}">
+                                        <a href="{% url 'core:switch_community' slug=comm.slug %}?scope=community" class="card h-100 p-3 text-decoration-none border-0 shadow-sm rounded-3 transition-card {% if active_community.id == comm.id and community_scope != 'all' %}border-2 border-warning bg-white shadow{% else %}bg-white text-dark hover-lift{% endif %}">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center gap-2.5">
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-light text-primary-bu" style="width: 40px; height: 40px;">
+                                                        <i class="bi {{ comm.icon|default:'bi-shop' }} fs-5 text-primary-bu"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark mb-0 fs-6">{{ comm.name }}</div>
+                                                        <div class="small text-muted"><i class="bi bi-geo-alt me-1 text-danger"></i>{{ comm.region }}</div>
+                                                    </div>
+                                                </div>
+                                                {% if active_community.id == comm.id and community_scope != 'all' %}
+                                                    <span class="badge bg-warning text-dark rounded-pill px-2.5 py-1 fw-bold small">
+                                                        <i class="bi bi-check2"></i> Active Hub
+                                                    </span>
+                                                {% else %}
+                                                    <i class="bi bi-chevron-right text-muted small"></i>
+                                                {% endif %}
+                                            </div>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-white border-0 py-2.5 px-4 d-flex justify-content-between">
+                    <span class="text-muted small">Current Hub: <strong class="text-dark">{% if community_scope == 'all' %}All Uganda{% else %}{{ active_community.name }}{% endif %}</strong></span>
+                    <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterCommunities() {
+            const query = (document.getElementById('communitySearchInput').value || '').toLowerCase().trim();
+            const items = document.querySelectorAll('.community-hub-item');
+            items.forEach(function(item) {
+                const text = (item.getAttribute('data-search-text') || '').toLowerCase();
+                if (!query || text.indexOf(query) !== -1) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
 
     <!-- Bootstrap 5 JavaScript bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

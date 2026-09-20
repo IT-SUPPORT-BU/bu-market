@@ -55,10 +55,15 @@
 
             <div class="card-body p-4">
                 <!-- Badges & Stats row -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="d-flex gap-2">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
                         <span class="badge badge-bu-category px-3 py-2 rounded-pill">{{ listing.category.name }}</span>
                         <span class="badge bg-light text-dark border px-3 py-2 rounded-pill text-uppercase">{{ listing.get_condition_display }}</span>
+                        {% if listing.community %}
+                            <span class="badge bg-light text-primary-bu border px-3 py-2 rounded-pill">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ listing.community.name }}
+                            </span>
+                        {% endif %}
                     </div>
                     <small class="text-muted d-flex align-items-center gap-1">
                         <i class="bi bi-eye-fill"></i> {{ listing.views_count }} views
@@ -74,19 +79,28 @@
                 <!-- Specifications Grid -->
                 <h4 class="fw-bold mb-3 text-dark">Specifications</h4>
                 <div class="row g-3 mb-4">
-                    <div class="col-6 col-md-4">
+                    <div class="col-6 col-md-3">
                         <div class="spec-box">
                             <div class="spec-title">Condition</div>
                             <div class="spec-value text-uppercase">{{ listing.get_condition_display }}</div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4">
+                    <div class="col-6 col-md-3">
                         <div class="spec-box">
                             <div class="spec-title">Location</div>
                             <div class="spec-value text-truncate" title="{{ listing.location }}">{{ listing.location }}</div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-4">
+                    <div class="col-6 col-md-3">
+                        <div class="spec-box">
+                            <div class="spec-title">Campus / Hub</div>
+                            <div class="spec-value text-truncate" title="{{ listing.community.name|default:'Uganda Hub' }}">
+                                <i class="bi {% if listing.community.hub_type == 'CAMPUS' %}bi-mortarboard-fill text-primary-bu{% else %}bi-shop text-primary-bu{% endif %} me-1"></i>
+                                {{ listing.community.name|default:'Uganda Hub' }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
                         <div class="spec-box">
                             <div class="spec-title">Published</div>
                             <div class="spec-value">{{ listing.created_at|date:"M d, Y" }}</div>

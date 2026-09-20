@@ -30,11 +30,30 @@ def mark_as_sold(request, slug):
 
 
 
-from .models import Hostel
+from .models import Hostel, Community
 
 
 def browse_hostels(request):
     hostels = Hostel.objects.filter(is_active=True, status=Hostel.Status.ACTIVE)
+
+    comm_param = request.GET.get('community')
+    scope_param = request.GET.get('scope')
+
+    if comm_param == 'all' or scope_param == 'all':
+        pass  # Nationwide
+    elif comm_param:
+        hostels = hostels.filter(community__slug=comm_param)
+    else:
+        session_scope = request.session.get('community_scope', 'community')
+        if session_scope == 'community':
+            comm_slug = request.session.get('community_slug')
+            active_comm = None
+            if comm_slug:
+                active_comm = Community.objects.filter(slug=comm_slug, is_active=True).first()
+            if not active_comm:
+                active_comm = Community.objects.filter(slug='bugema-university', is_active=True).first() or Community.objects.first()
+            if active_comm:
+                hostels = hostels.filter(community=active_comm)
 
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')

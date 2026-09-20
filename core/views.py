@@ -1,12 +1,34 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
-from marketplace.models import Category, Listing
+from marketplace.models import Category, Listing, Community
 from accounts.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib import messages as django_messages
 from messaging.models import Conversation
+
+
+def switch_community(request, slug):
+    """
+    Switches the active community or scope in the user session,
+    then redirects back to the previous page.
+    """
+    if slug == 'all':
+        request.session['community_scope'] = 'all'
+    else:
+        community = get_object_or_404(Community, slug=slug, is_active=True)
+        request.session['community_slug'] = community.slug
+        request.session['community_scope'] = 'community'
+
+    scope_param = request.GET.get('scope')
+    if scope_param in ['community', 'all']:
+        request.session['community_scope'] = scope_param
+
+    referer = request.META.get('HTTP_REFERER')
+    if referer and referer.startswith(request.build_absolute_uri('/')[:-1]):
+        return redirect(referer)
+    return redirect('core:home')
 
 
 class HomeView(ListView):
@@ -15,16 +37,39 @@ class HomeView(ListView):
     context_object_name = 'listings'
 
     def get_queryset(self):
-        # We only show ACTIVE listings
-        return Listing.objects.filter(status=Listing.Status.ACTIVE).order_by('-is_promoted', '-created_at')
+        queryset = Listing.objects.filter(status=Listing.Status.ACTIVE)
+        scope = self.request.session.get('community_scope', 'community')
+        comm_slug = self.request.session.get('community_slug')
+
+        if scope == 'community':
+            active_comm = None
+            if comm_slug:
+                active_comm = Community.objects.filter(slug=comm_slug, is_active=True).first()
+            if not active_comm:
+                active_comm = Community.objects.filter(slug='bugema-university', is_active=True).first() or Community.objects.first()
+            if active_comm:
+                queryset = queryset.filter(community=active_comm)
+
+        return queryset.order_by('-is_promoted', '-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.filter(is_active=True)
-        context['promoted_listings'] = Listing.objects.filter(
-            status=Listing.Status.ACTIVE,
-            is_promoted=True
-        ).order_by('-created_at')[:4]
+
+        scope = self.request.session.get('community_scope', 'community')
+        comm_slug = self.request.session.get('community_slug')
+
+        promoted_qs = Listing.objects.filter(status=Listing.Status.ACTIVE, is_promoted=True)
+        if scope == 'community':
+            active_comm = None
+            if comm_slug:
+                active_comm = Community.objects.filter(slug=comm_slug, is_active=True).first()
+            if not active_comm:
+                active_comm = Community.objects.filter(slug='bugema-university', is_active=True).first() or Community.objects.first()
+            if active_comm:
+                promoted_qs = promoted_qs.filter(community=active_comm)
+
+        context['promoted_listings'] = promoted_qs.order_by('-created_at')[:4]
         return context
 
 
@@ -37,7 +82,7 @@ class BrowseView(ListView):
     def get_queryset(self):
         queryset = Listing.objects.filter(status=Listing.Status.ACTIVE)
 
-        # Apply filters
+        # Apply search query
         q = self.request.GET.get('q')
         if q:
             queryset = queryset.filter(Q(title__icontains=q) | Q(description__icontains=q))
@@ -46,11 +91,29 @@ class BrowseView(ListView):
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
 
+        # Community & Scope Filter
+        comm_param = self.request.GET.get('community')
+        scope_param = self.request.GET.get('scope')
+
+        if comm_param == 'all' or scope_param == 'all':
+            pass  # Nationwide / All Communities
+        elif comm_param:
+            queryset = queryset.filter(community__slug=comm_param)
+        else:
+            session_scope = self.request.session.get('community_scope', 'community')
+            if session_scope == 'community':
+                comm_slug = self.request.session.get('community_slug')
+                active_comm = None
+                if comm_slug:
+                    active_comm = Community.objects.filter(slug=comm_slug, is_active=True).first()
+                if not active_comm:
+                    active_comm = Community.objects.filter(slug='bugema-university', is_active=True).first() or Community.objects.first()
+                if active_comm:
+                    queryset = queryset.filter(community=active_comm)
 
         location = self.request.GET.get('location')
         if location:
             queryset = queryset.filter(location__icontains=location)
-
 
         min_price = self.request.GET.get('min_price')
         if min_price:

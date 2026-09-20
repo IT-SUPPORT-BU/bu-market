@@ -23,6 +23,32 @@ class Category(models.Model):
         return self.name
 
 
+class Community(models.Model):
+    class HubType(models.TextChoices):
+        CAMPUS = 'CAMPUS', 'University / College Campus'
+        TOWN = 'TOWN', 'Town / Suburb / Commercial Center'
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
+    hub_type = models.CharField(max_length=20, choices=HubType.choices, default=HubType.CAMPUS)
+    region = models.CharField(max_length=50, default='Central Region')
+    icon = models.CharField(max_length=50, default='bi-mortarboard-fill', help_text="Bootstrap icon class")
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name_plural = "Communities"
+        ordering = ['order', 'name']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+
 class Listing(models.Model):
     class Condition(models.TextChoices):
         NEW = 'NEW', 'New'
@@ -54,6 +80,13 @@ class Listing(models.Model):
     sold_at = models.DateTimeField(null=True, blank=True)
     removal_reason = models.TextField(blank=True, null=True)
     # ... any other fields you already have (views_count, created_at, etc.)
+    community = models.ForeignKey(
+        Community,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='listings'
+    )
     location = models.CharField(max_length=100, default='Bugema University Main Campus')
     image = models.ImageField(
         upload_to='listings/',
@@ -158,6 +191,13 @@ class Hostel(models.Model):
     )
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=120, unique=True, blank=True)
+    community = models.ForeignKey(
+        Community,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='hostels'
+    )
     location = models.CharField(max_length=150)
     price = models.DecimalField(max_digits=12, decimal_places=2)
     description = models.TextField(

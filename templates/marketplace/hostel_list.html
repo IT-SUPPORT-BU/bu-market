@@ -6,9 +6,14 @@
 {% block content %}
 <div class="my-4">
     <div class="d-flex justify-content-between align-items-center flex-wrap mb-4 gap-2">
-        <h2 class="fw-bold mb-0 d-flex align-items-center">
-            <i class="bi bi-house-door-fill text-primary-bu me-2"></i> Looking for Hostel ? lets find one. Easy🤗
-        </h2>
+        <div>
+            <h2 class="fw-bold mb-0 d-inline-block align-middle">
+                <i class="bi bi-house-door-fill text-primary-bu me-2"></i> Find Hostels & Rentals
+            </h2>
+            <span class="badge bg-primary-bu text-white rounded-pill px-2.5 py-1.5 ms-2 align-middle" style="font-size: 0.75rem;">
+                <i class="bi bi-geo-alt-fill text-warning me-1"></i>{% if community_scope == 'all' or request.GET.community == 'all' %}All Uganda (Nationwide){% elif active_community %}{{ active_community.name }}{% endif %}
+            </span>
+        </div>
         {% if user.is_authenticated %}
             <a href="{% url 'dashboard:create_hostel' %}" class="btn btn-primary-bu rounded-pill px-3">
                 <i class="bi bi-plus-circle-fill me-1"></i> Post a Hostel
@@ -16,9 +21,25 @@
         {% endif %}
     </div>
 
-    <!-- Price Filter -->
+    <!-- Filters -->
     <form method="get" class="bg-white rounded-4 shadow-sm p-3 mb-4">
         <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-4">
+                <label class="form-label small fw-semibold"><i class="bi bi-geo-alt-fill text-warning me-1"></i>Campus / Community</label>
+                <select name="community" class="form-select">
+                    <option value="all" {% if request.GET.community == 'all' or community_scope == 'all' and not request.GET.community %}selected{% endif %}>🌐 All Uganda (Nationwide)</option>
+                    <optgroup label="🎓 Universities & Campuses">
+                        {% for comm in campus_communities %}
+                            <option value="{{ comm.slug }}" {% if request.GET.community == comm.slug or not request.GET.community and active_community.slug == comm.slug and community_scope != 'all' %}selected{% endif %}>{{ comm.name }}</option>
+                        {% endfor %}
+                    </optgroup>
+                    <optgroup label="🏙️ Commercial Hubs & Towns">
+                        {% for comm in town_communities %}
+                            <option value="{{ comm.slug }}" {% if request.GET.community == comm.slug or not request.GET.community and active_community.slug == comm.slug and community_scope != 'all' %}selected{% endif %}>{{ comm.name }}</option>
+                        {% endfor %}
+                    </optgroup>
+                </select>
+            </div>
             <div class="col-6 col-md-3">
                 <label class="form-label small fw-semibold">Min Price (UGX)</label>
                 <input type="number" name="min_price" value="{{ min_price|default:'' }}" class="form-control" placeholder="e.g. 100000">
@@ -27,7 +48,7 @@
                 <label class="form-label small fw-semibold">Max Price (UGX)</label>
                 <input type="number" name="max_price" value="{{ max_price|default:'' }}" class="form-control" placeholder="e.g. 500000">
             </div>
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-2">
                 <button type="submit" class="btn btn-primary-bu w-100">
                     <i class="bi bi-funnel-fill me-1"></i> Filter
                 </button>
@@ -54,9 +75,18 @@
                     </div>
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title fw-bold mb-1">{{ hostel.name }}</h5>
-                        <p class="text-muted small mb-3">
+                        <p class="text-muted small mb-1">
                             <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ hostel.location }}
                         </p>
+                        {% if hostel.community %}
+                            <div class="mb-3">
+                                <span class="badge bg-light text-dark border rounded-pill px-2 py-0.5" style="font-size: 0.68rem;">
+                                    <i class="bi {% if hostel.community.hub_type == 'CAMPUS' %}bi-mortarboard-fill text-primary-bu{% else %}bi-building text-primary-bu{% endif %} me-1"></i>{{ hostel.community.name }}
+                                </span>
+                            </div>
+                        {% else %}
+                            <div class="mb-3"></div>
+                        {% endif %}
                         <div class="mt-auto d-flex justify-content-between align-items-center">
                             <span class="text-primary-bu fw-bold fs-5">{{ hostel.price }} UGX</span>
                             <a href="{% url 'core:hostel_detail' hostel.slug %}" class="btn btn-primary-bu btn-sm px-3 rounded-pill">View</a>
@@ -69,7 +99,12 @@
                 <div class="d-inline-flex p-4 rounded-circle bg-light mb-3 text-muted">
                     <i class="bi bi-house display-4"></i>
                 </div>
-                <p class="mt-3 text-muted fw-semibold">No hostels available right now.</p>
+                <p class="mt-3 text-muted fw-semibold">No hostels available in this community right now.</p>
+                <div class="mt-2">
+                    <button type="button" class="btn btn-primary-bu btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#communityModal">
+                        Browse Other Campuses & Towns
+                    </button>
+                </div>
             </div>
         {% endfor %}
     </div>

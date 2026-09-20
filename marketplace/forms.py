@@ -1,10 +1,10 @@
 from django import forms
-from .models import Listing, Hostel, HostelImage
+from .models import Listing, Hostel, HostelImage, Community
 
 class ListingForm(forms.ModelForm):
     class Meta:
         model = Listing
-        fields = ['category', 'title', 'description', 'price', 'condition', 'location', 'image', 'is_promoted', 'phone_number', 'whatsapp_number']
+        fields = ['category', 'community', 'title', 'description', 'price', 'condition', 'location', 'image', 'is_promoted', 'phone_number', 'whatsapp_number']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }
@@ -12,6 +12,8 @@ class ListingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+        self.fields['community'].queryset = Community.objects.filter(is_active=True).order_by('order', 'name')
+        self.fields['community'].empty_label = "Select Campus or Town Hub"
 
     def clean(self):
         cleaned_data = super().clean()
@@ -32,7 +34,7 @@ class HostelForm(forms.ModelForm):
 
     class Meta:
         model = Hostel
-        fields = ['name', 'location', 'price', 'description', 'phone_number', 'whatsapp_number']
+        fields = ['name', 'community', 'location', 'price', 'description', 'phone_number', 'whatsapp_number']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }
@@ -40,6 +42,8 @@ class HostelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+        self.fields['community'].queryset = Community.objects.filter(is_active=True).order_by('order', 'name')
+        self.fields['community'].empty_label = "Select Campus or Town Hub"
 
     def clean(self):
         cleaned_data = super().clean()
