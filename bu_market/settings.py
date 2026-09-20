@@ -120,16 +120,22 @@ WSGI_APPLICATION = 'bu_market.wsgi.application'
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-if not DATABASE_URL:
-    raise ImproperlyConfigured("DATABASE_URL environment variable is required.")
-
-DATABASES = {
-    'default': dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # In-memory fallback during build steps (e.g. collectstatic) when env vars are not yet bound
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
 
 
 # Password validation
@@ -175,18 +181,26 @@ SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_SERVICE_ROLE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
 SUPABASE_STORAGE_BUCKET = os.getenv('SUPABASE_STORAGE_BUCKET', 'media')
 
-if not (SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY):
-    raise ImproperlyConfigured("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables are required for cloud media storage.")
-
-STORAGES = {
-    "default": {
-        "BACKEND": "core.storage.SupabaseMediaStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-    },
-}
-MEDIA_URL = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{SUPABASE_STORAGE_BUCKET}/"
+if SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY:
+    STORAGES = {
+        "default": {
+            "BACKEND": "core.storage.SupabaseMediaStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
+    MEDIA_URL = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{SUPABASE_STORAGE_BUCKET}/"
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.InMemoryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
+    MEDIA_URL = '/media/'
 
 # Custom User model
 AUTH_USER_MODEL = 'accounts.User'
