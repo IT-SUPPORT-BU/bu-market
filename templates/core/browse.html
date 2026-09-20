@@ -35,7 +35,7 @@
         <div class="d-flex align-items-center gap-1 mt-2 flex-wrap px-1">
             <span class="small text-muted me-1" style="font-size: 0.75rem;">Active:</span>
             {% if request.GET.q %}
-                <span class="badge bg-primary-bu bg-opacity-10 text-primary-bu border border-primary border-opacity-10 rounded-pill">"{{ request.GET.q }}"</span>
+                <span class="badge badge-bu-category rounded-pill">"{{ request.GET.q }}"</span>
             {% endif %}
             {% if request.GET.category %}
                 <span class="badge bg-accent-bu text-dark rounded-pill">{{ request.GET.category }}</span>
@@ -242,7 +242,7 @@
                         
                         <div class="card-body d-flex flex-column p-2.5 p-md-3">
                             <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-1">
-                                <span class="badge {% if listing.is_promoted %}bg-primary-bu{% else %}bg-light text-dark border{% endif %} rounded-pill px-2 py-1" style="font-size: 0.7rem;">{{ listing.category.name }}</span>
+                                <span class="badge badge-bu-category rounded-pill">{{ listing.category.name }}</span>
                                 <span class="badge text-uppercase bg-light text-dark border rounded-pill px-2 py-1" style="font-size: 0.65rem;">{{ listing.get_condition_display }}</span>
                             </div>
                             

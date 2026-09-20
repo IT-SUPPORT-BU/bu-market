@@ -37,6 +37,25 @@
 }
 
 /* Custom badges */
+.badge-bu-category {
+    background-color: #EEF2F9 !important;
+    color: #0E1931 !important;
+    border: 1px solid rgba(14, 25, 49, 0.15) !important;
+    font-weight: 600 !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.2px;
+    padding: 4px 8px !important;
+}
+
+.badge-bu-promoted {
+    background-color: #FFC107 !important;
+    color: #0E1931 !important;
+    font-weight: 700 !important;
+    font-size: 0.68rem !important;
+    border: 1px solid rgba(14, 25, 49, 0.15) !important;
+    letter-spacing: 0.3px;
+}
+
 .badge-silver {
     background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
     color: white;
