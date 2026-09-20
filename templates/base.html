@@ -258,6 +258,7 @@
                             {% endif %}
                             <li><a class="dropdown-menu-item dropdown-item" href="{% url 'messaging:inbox' %}">View all messages</a></li>
                             <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-menu-item dropdown-item" href="{% url 'core:my_offers' %}"><i class="bi bi-tag-fill text-warning me-2"></i> My Bargains & Offers</a></li>
                             <li><a class="dropdown-menu-item dropdown-item" href="{% url 'dashboard:home' %}">Dashboard</a></li>
                             {% if user.is_seller %}
                             <li><a class="dropdown-menu-item dropdown-item" href="{% url 'dashboard:seller_listings' %}">My Listings</a></li>

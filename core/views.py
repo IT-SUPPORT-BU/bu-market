@@ -1,12 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
-from marketplace.models import Category, Listing, Community
+from django.http import JsonResponse
+from django.urls import reverse
+import decimal
+from marketplace.models import Category, Listing, Community, Offer
 from accounts.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib import messages as django_messages
-from messaging.models import Conversation
+from messaging.models import Conversation, Message
 
 
 def switch_community(request, slug):
@@ -192,6 +195,17 @@ class ListingDetailView(DetailView):
 
         return listing
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        listing = self.object
+        if user.is_authenticated:
+            if user != listing.seller:
+                context['buyer_active_offer'] = listing.offers.filter(buyer=user).first()
+            else:
+                context['incoming_offers'] = listing.offers.all().order_by('-created_at')
+        return context
+
 
 def seller_profile(request, username):
     seller = get_object_or_404(User, username=username, role=User.Role.SELLER)
@@ -228,3 +242,231 @@ def mark_as_sold(request, slug):
         return redirect('core:listing_detail', slug=listing.slug)
 
     return redirect('core:listing_detail', slug=listing.slug)
+
+
+@login_required
+def make_offer(request, slug):
+    listing = get_object_or_404(Listing, slug=slug)
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+    if request.user == listing.seller:
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'message': "You cannot make an offer on your own listing."}, status=400)
+        django_messages.error(request, "You cannot make an offer on your own listing.")
+        return redirect('core:listing_detail', slug=slug)
+
+    if listing.status != Listing.Status.ACTIVE:
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'message': "This item is no longer active for offers."}, status=400)
+        django_messages.error(request, "This item is no longer active.")
+        return redirect('core:listing_detail', slug=slug)
+
+    if request.method == 'POST':
+        raw_price = request.POST.get('offered_price', '0').replace(',', '').strip()
+        try:
+            offered_price = decimal.Decimal(raw_price)
+        except (ValueError, decimal.InvalidOperation):
+            offered_price = decimal.Decimal('0')
+
+        if offered_price <= 0:
+            if is_ajax:
+                return JsonResponse({'status': 'error', 'message': "Please enter a valid offer amount in UGX."}, status=400)
+            django_messages.error(request, "Please enter a valid offer amount in UGX.")
+            return redirect('core:listing_detail', slug=slug)
+
+        buyer_note = request.POST.get('buyer_note', '').strip()[:255]
+
+        # Fetch or create offer for this buyer on this listing
+        offer, created = Offer.objects.get_or_create(
+            listing=listing,
+            buyer=request.user,
+            seller=listing.seller,
+            defaults={
+                'original_price': listing.price,
+                'offered_price': offered_price,
+                'buyer_note': buyer_note,
+                'status': Offer.Status.PENDING,
+            }
+        )
+        if not created:
+            offer.original_price = listing.price
+            offer.offered_price = offered_price
+            offer.counter_price = None
+            offer.buyer_note = buyer_note
+            offer.seller_note = ''
+            offer.status = Offer.Status.PENDING
+            offer.save()
+
+        # Connect with in-app Conversation
+        try:
+            conversation, _ = Conversation.objects.get_or_create(
+                listing=listing,
+                buyer=request.user,
+                seller=listing.seller,
+            )
+            msg_text = f"🤝 Bargain Offer: {offered_price:,.0f} UGX (Original Price: {listing.price:,.0f} UGX)."
+            if buyer_note:
+                msg_text += f" Message: \"{buyer_note}\""
+            Message.objects.create(
+                conversation=conversation,
+                sender=request.user,
+                body=msg_text
+            )
+        except Exception:
+            pass
+
+        if is_ajax:
+            return JsonResponse({
+                'status': 'success',
+                'message': f"🚀 Your offer of {offered_price:,.0f} UGX was sent to {listing.seller.username}!",
+                'offer_id': offer.id,
+                'offered_price': f"{offered_price:,.0f} UGX",
+            })
+
+        django_messages.success(request, f"🚀 Your offer of {offered_price:,.0f} UGX was sent to {listing.seller.username}!")
+        return redirect('core:listing_detail', slug=slug)
+
+    return redirect('core:listing_detail', slug=slug)
+
+
+@login_required
+def respond_offer(request, offer_id):
+    offer = get_object_or_404(Offer, id=offer_id)
+    user = request.user
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+    if user not in [offer.seller, offer.buyer]:
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'message': "Permission denied."}, status=403)
+        django_messages.error(request, "Permission denied.")
+        return redirect('core:home')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')  # 'accept', 'counter', 'decline'
+        note = request.POST.get('note', '').strip()[:255]
+
+        if action == 'accept':
+            offer.status = Offer.Status.ACCEPTED
+            offer.generate_deal_code()
+            if user == offer.seller:
+                offer.seller_note = note or "Offer accepted! Deal locked 🎉"
+            else:
+                offer.buyer_note = note or "Counter offer accepted! Deal locked 🎉"
+            offer.save()
+
+            # Post notification into chat
+            try:
+                conv = Conversation.objects.filter(listing=offer.listing, buyer=offer.buyer, seller=offer.seller).first()
+                if conv:
+                    Message.objects.create(
+                        conversation=conv,
+                        sender=user,
+                        body=f"🎉 Deal Confirmed! Agreed price: {offer.final_price:,.0f} UGX (Deal Code: {offer.deal_code})."
+                    )
+            except Exception:
+                pass
+
+            receipt_url = reverse('core:deal_receipt', kwargs={'offer_id': offer.id})
+            if is_ajax:
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Offer accepted! Deal pass generated.',
+                    'deal_code': offer.deal_code,
+                    'receipt_url': receipt_url
+                })
+
+            django_messages.success(request, f"🎉 Deal confirmed at {offer.final_price:,.0f} UGX! Deal Pass generated.")
+            return redirect('core:deal_receipt', offer_id=offer.id)
+
+        elif action == 'counter':
+            raw_counter = request.POST.get('counter_price', '0').replace(',', '').strip()
+            try:
+                counter_price = decimal.Decimal(raw_counter)
+            except (ValueError, decimal.InvalidOperation):
+                counter_price = decimal.Decimal('0')
+
+            if counter_price <= 0:
+                if is_ajax:
+                    return JsonResponse({'status': 'error', 'message': "Please enter a valid counter price in UGX."}, status=400)
+                django_messages.error(request, "Please enter a valid counter price in UGX.")
+                return redirect(request.META.get('HTTP_REFERER', 'core:my_offers'))
+
+            offer.counter_price = counter_price
+            offer.status = Offer.Status.COUNTERED
+            if user == offer.seller:
+                offer.seller_note = note or f"Seller countered: {counter_price:,.0f} UGX"
+            else:
+                offer.buyer_note = note or f"Buyer countered: {counter_price:,.0f} UGX"
+            offer.save()
+
+            try:
+                conv = Conversation.objects.filter(listing=offer.listing, buyer=offer.buyer, seller=offer.seller).first()
+                if conv:
+                    Message.objects.create(
+                        conversation=conv,
+                        sender=user,
+                        body=f"⚡ Counter Offer: {counter_price:,.0f} UGX. Note: \"{note}\""
+                    )
+            except Exception:
+                pass
+
+            if is_ajax:
+                return JsonResponse({
+                    'status': 'success',
+                    'message': f"⚡ Counter offer of {counter_price:,.0f} UGX sent!",
+                    'counter_price': f"{counter_price:,.0f} UGX"
+                })
+
+            django_messages.success(request, f"⚡ Counter offer of {counter_price:,.0f} UGX sent!")
+            return redirect(request.META.get('HTTP_REFERER', 'core:my_offers'))
+
+        elif action == 'decline':
+            offer.status = Offer.Status.DECLINED
+            if user == offer.seller:
+                offer.seller_note = note or "Offer declined."
+            else:
+                offer.buyer_note = note or "Counter offer declined."
+            offer.save()
+
+            if is_ajax:
+                return JsonResponse({'status': 'success', 'message': "Offer declined."})
+
+            django_messages.info(request, "Offer has been declined.")
+            return redirect(request.META.get('HTTP_REFERER', 'core:my_offers'))
+
+    return redirect('core:my_offers')
+
+
+@login_required
+def deal_receipt(request, offer_id):
+    offer = get_object_or_404(Offer, id=offer_id, status=Offer.Status.ACCEPTED)
+    if request.user not in [offer.buyer, offer.seller] and not request.user.is_staff:
+        django_messages.error(request, "You do not have permission to view this deal receipt.")
+        return redirect('core:home')
+
+    is_buyer = request.user == offer.buyer
+    whatsapp_deal_url = offer.get_whatsapp_url(recipient_role='seller' if is_buyer else 'buyer')
+
+    context = {
+        'offer': offer,
+        'listing': offer.listing,
+        'is_buyer': is_buyer,
+        'other_party': offer.seller if is_buyer else offer.buyer,
+        'whatsapp_deal_url': whatsapp_deal_url,
+    }
+    return render(request, 'marketplace/deal_receipt.html', context)
+
+
+@login_required
+def my_offers(request):
+    user = request.user
+    offers_made = Offer.objects.filter(buyer=user).select_related('listing', 'seller', 'listing__community').order_by('-updated_at')
+    offers_received = Offer.objects.filter(seller=user).select_related('listing', 'buyer', 'listing__community').order_by('-updated_at')
+
+    context = {
+        'offers_made': offers_made,
+        'offers_received': offers_received,
+        'pending_received_count': offers_received.filter(status=Offer.Status.PENDING).count(),
+        'active_bargains_count': offers_made.filter(status__in=[Offer.Status.PENDING, Offer.Status.COUNTERED]).count(),
+    }
+    return render(request, 'marketplace/my_offers.html', context)
