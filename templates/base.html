@@ -18,14 +18,18 @@
     <link rel="icon" type="image/png" href="{% static 'images/bu-market-logo1.png' %}">
 
     <style>
-    :root {
-            --primary-color: #0D6EFD;      /* Bright, confident blue — main brand */
-            --primary-dark: #0B5ED7;       /* Darker blue for hover states */
-            --dark-color: #1F2937;         /* Charcoal — secondary bar, footer base */
-            --dark-darker: #111827;        /* Slightly deeper charcoal for gradient/hover */
-            --light-bg: #EEF3FA;           /* Soft blue-tinted section background */
-            --text-color: #1A1D20;
-            --gray-color: #6C757D;
+        :root {
+            --primary-color: #0E1931;      /* Exact user swatch: Midnight Navy Blue */
+            --primary-dark: #070D1A;       /* Deeper midnight tone for borders/depth */
+            --primary-hover: #16264C;      /* Elevated navy for hover states */
+            --primary-surface: #121F3D;    /* Elevated navy surface for dark sections */
+            --accent-yellow: #FFC107;      /* Warm golden yellow accent */
+            --accent-yellow-dark: #E0A800; /* Darker yellow for hover */
+            --dark-color: #0E1931;         /* Navbar & footer base */
+            --dark-darker: #070D1A;
+            --light-bg: #F8FAFC;           /* Crisp, clean white-slate background */
+            --text-color: #0E1931;         /* Deep navy text */
+            --gray-color: #64748B;
             --white: #FFFFFF;
         }
 
@@ -44,41 +48,47 @@
         }
 
         /* Color Utility Classes */
-        .bg-primary-bu { background-color: var(--primary-color) !important; }
+        .bg-primary-bu { background-color: var(--primary-color) !important; color: var(--white) !important; }
         .text-primary-bu { color: var(--primary-color) !important; }
         .bg-dark-bu { background-color: var(--dark-color) !important; }
+        .text-accent-bu { color: var(--accent-yellow) !important; }
+        .bg-accent-bu { background-color: var(--accent-yellow) !important; color: var(--primary-color) !important; }
 
         /* Custom Buttons */
         .btn-primary-bu {
             background-color: var(--primary-color);
-            color: white;
-            border: none;
-            transition: all 0.3s ease;
-        }
-        .btn-primary-bu:hover {
-            background-color: var(--primary-dark);
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        /* Accent button now uses charcoal instead of gold — calm, minimal, no competing color */
-        .btn-accent-bu {
-            background-color: var(--dark-color);
-            color: white;
-            border: none;
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             font-weight: 500;
             transition: all 0.3s ease;
         }
-        .btn-accent-bu:hover {
-            background-color: var(--dark-darker);
-            color: white;
+        .btn-primary-bu:hover {
+            background-color: var(--primary-hover);
+            color: var(--accent-yellow);
             transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(14, 25, 49, 0.35);
         }
 
-        .text-accent-bu { color: var(--primary-color) !important; }
+        /* Yellow Accent Button */
+        .btn-accent-bu {
+            background-color: var(--accent-yellow);
+            color: var(--primary-color);
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-accent-bu:hover {
+            background-color: var(--accent-yellow-dark);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+        }
 
         .navbar-brand img { height: 40px; }
-        .navbar { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); }
+        .navbar {
+            box-shadow: 0 2px 12px rgba(14, 25, 49, 0.18);
+            border-bottom: 2px solid rgba(255, 193, 7, 0.3);
+        }
 
         .listing-card {
             border: none;
@@ -86,10 +96,11 @@
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
+            background-color: var(--white);
         }
         .listing-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.10);
+            box-shadow: 0 10px 20px rgba(14, 25, 49, 0.12);
         }
 
         .nav-link, .btn {
@@ -103,20 +114,20 @@
             position: fixed;
             bottom: 0; left: 0; right: 0;
             height: 65px;
-            background-color: white;
-            border-top: 1px solid #dee2e6;
+            background-color: var(--primary-color);
+            border-top: 2px solid var(--accent-yellow);
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 1030;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 -4px 15px rgba(14, 25, 49, 0.3);
         }
         .bottom-nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: var(--gray-color);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             font-size: 0.75rem;
             flex-grow: 1;
@@ -124,15 +135,16 @@
             transition: color 0.2s ease;
         }
         .bottom-nav-item i { font-size: 1.4rem; margin-bottom: 2px; }
-        .bottom-nav-item.active, .bottom-nav-item:hover { color: var(--primary-color); }
+        .bottom-nav-item.active, .bottom-nav-item:hover { color: var(--accent-yellow); }
 
-        .badge-silver { background-color: #C0C0C0; color: #333; }
-        .badge-gold { background-color: var(--primary-color); color: white; } /* was yellow, now brand blue */
+        .badge-silver { background-color: #C0C0C0; color: #0E1931; font-weight: 600; }
+        .badge-gold { background-color: var(--accent-yellow); color: var(--primary-color); font-weight: 700; }
 
         footer {
             margin-top: auto;
-            background-color: var(--dark-color) !important;
-            color: white;
+            background-color: var(--primary-color) !important;
+            color: var(--white);
+            border-top: 3px solid var(--accent-yellow);
         }
     </style>
     <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.0.2">

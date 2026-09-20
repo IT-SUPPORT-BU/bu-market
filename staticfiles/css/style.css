@@ -65,7 +65,7 @@
 }
 
 .btn-call {
-    background-color: #003B8E;
+    background-color: #0E1931;
     color: white;
     border: none;
     font-weight: 600;
@@ -73,10 +73,10 @@
 }
 
 .btn-call:hover {
-    background-color: #002b66;
-    color: white;
+    background-color: #16264C;
+    color: #FFC107;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 59, 142, 0.3);
+    box-shadow: 0 4px 12px rgba(14, 25, 49, 0.35);
 }
 
 /* Locked Section */
@@ -195,7 +195,7 @@
 
 /* Hero Section Enhancements */
 .hero-gradient {
-    background: linear-gradient(135deg, #001f4d 0%, #003B8E 50%, #084aa1 100%) !important;
+    background: linear-gradient(135deg, #070D1A 0%, #0E1931 50%, #16264C 100%) !important;
     position: relative;
     z-index: 1;
 }
@@ -595,10 +595,10 @@
 
 /* Premium Footer Styles (Matching Navbar Theme) */
 .desktop-footer {
-    background: linear-gradient(180deg, #003B8E 0%, #002b66 100%) !important;
+    background: linear-gradient(180deg, #0E1931 0%, #070D1A 100%) !important;
     color: #cbd5e1 !important;
     font-size: 0.9rem;
-    border-top: 3px solid var(--accent-color);
+    border-top: 3px solid #FFC107;
 }
 
 .desktop-footer a {
@@ -608,7 +608,7 @@
 }
 
 .desktop-footer a:hover {
-    color: var(--accent-color) !important;
+    color: #FFC107 !important;
     padding-left: 4px;
 }
 
@@ -632,17 +632,17 @@
 }
 
 .footer-social-icon:hover {
-    background: var(--accent-color);
-    color: #1A1D20 !important;
+    background: #FFC107;
+    color: #0E1931 !important;
     transform: translateY(-3px);
 }
 
 /* Mobile Footer (Ultra-compact for phone screens) */
 .mobile-footer {
-    background: #002b66 !important;
+    background: #0E1931 !important;
     color: #cbd5e1 !important;
     padding-bottom: 80px !important; /* Space for bottom nav bar */
-    border-top: 2px solid var(--accent-color);
+    border-top: 2px solid #FFC107;
     font-size: 0.85rem;
 }
 
@@ -652,7 +652,7 @@
 }
 
 .mobile-footer a:hover {
-    color: var(--accent-color);
+    color: #FFC107;
 }
 
 /* --- HERO SELLER IMAGE & FADEOUT STYLES --- */
@@ -660,9 +660,9 @@
     position: relative;
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    background: linear-gradient(135deg, rgba(0, 59, 142, 0.9), rgba(15, 23, 42, 0.95));
+    background: linear-gradient(135deg, #0E1931 0%, #070D1A 100%);
     overflow: hidden;
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 40px -15px rgba(14, 25, 49, 0.4);
 }
 
 .hero-seller-img {
@@ -685,7 +685,7 @@
     left: 0;
     bottom: 0;
     width: 45%;
-    background: linear-gradient(to right, #003B8E 0%, rgba(0, 59, 142, 0.8) 35%, rgba(0, 59, 142, 0) 100%);
+    background: linear-gradient(to right, #0E1931 0%, rgba(14, 25, 49, 0.85) 35%, rgba(14, 25, 49, 0) 100%);
     z-index: 2;
     pointer-events: none;
 }
@@ -697,7 +697,7 @@
     right: 0;
     bottom: 0;
     height: 35%;
-    background: linear-gradient(to top, rgba(0, 43, 102, 0.95) 0%, rgba(0, 43, 102, 0) 100%);
+    background: linear-gradient(to top, rgba(14, 25, 49, 0.95) 0%, rgba(14, 25, 49, 0) 100%);
     z-index: 2;
     pointer-events: none;
 }
