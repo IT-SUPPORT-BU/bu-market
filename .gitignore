@@ -2,8 +2,6 @@
 __pycache__/
 db.sqlite3
 .env
-staticfiles/
-staticfiles_build/
 media/
 .vscode/
 .idea/
