@@ -73,4 +73,67 @@
         </table>
     </div>
 </div>
+
+
+
+<div class="card border-0 shadow-sm p-4 mt-4">
+    <h4 class="fw-bold mb-4 d-flex align-items-center">
+        <i class="bi bi-house-door-fill text-primary-bu me-2"></i> Hostels Pending Approval
+    </h4>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Photo</th>
+                    <th>Hostel details</th>
+                    <th>Owner</th>
+                    <th>Price</th>
+                    <th class="text-end">Moderation Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hostel in pending_hostels %}
+                    <tr>
+                        <td style="width: 100px;">
+                            {% with hostel.images.first as first_image %}
+                                {% if first_image %}
+                                    <img src="{{ first_image.image.url }}" class="img-thumbnail" alt="{{ hostel.name }}" style="width: 80px; height: 80px; object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-secondary text-white text-center rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">No Pic</div>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td>
+                            <h6 class="fw-bold mb-1">{{ hostel.name }}</h6>
+                            <p class="mb-1 text-muted small">{{ hostel.location }}</p>
+                        </td>
+                        <td>{{ hostel.owner.username }}</td>
+                        <td class="fw-bold text-primary-bu">{{ hostel.price }} UGX</td>
+                        <td class="text-end">
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a href="{% url 'core:hostel_detail' hostel.slug %}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                    <i class="bi bi-eye"></i> Details
+                                </a>
+                                <a href="{% url 'moderation:approve_hostel' hostel.pk %}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-circle"></i> Approve
+                                </a>
+                                <a href="{% url 'moderation:reject_hostel' hostel.pk %}" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-x-circle"></i> Reject
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-check-circle-fill text-success display-4 d-block mb-3"></i>
+                            No hostels currently waiting for moderation.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

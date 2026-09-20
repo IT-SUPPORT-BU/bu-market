@@ -8,6 +8,7 @@ class SubscriptionPlan(models.Model):
         BASIC = 'BASIC', 'Basic'
         SILVER = 'SILVER', 'Silver'
         GOLD = 'GOLD', 'Gold'
+        QUICK_SALE = 'QUICK_SALE', 'Quick Sale'
 
     class BadgeType(models.TextChoices):
         NONE = 'none', 'None'
@@ -19,7 +20,8 @@ class SubscriptionPlan(models.Model):
         choices=PlanType.choices,
         unique=True
     )
-    monthly_fee = models.DecimalField(max_digits=10, decimal_places=2)  # In UGX
+    monthly_fee = models.DecimalField(max_digits=10, decimal_places=2)
+    duration_days = models.PositiveIntegerField(default=30)
     max_active_listings = models.PositiveIntegerField()
     badge = models.CharField(
         max_length=10,
@@ -81,7 +83,7 @@ class BuyerMembership(models.Model):
         on_delete=models.CASCADE,
         related_name='buyer_membership'
     )
-    fee = models.DecimalField(max_digits=10, decimal_places=2, default=20000.00)  # In UGX
+    fee = models.DecimalField(max_digits=10, decimal_places=2, default=20000.00)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
     receipt_image = models.ImageField(
         upload_to='receipts/buyer/',
@@ -105,4 +107,3 @@ class BuyerMembership(models.Model):
 
     def __str__(self):
         return f"{self.buyer.username} - Buyer ({self.get_status_display()})"
-

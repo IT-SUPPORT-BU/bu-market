@@ -132,91 +132,28 @@
 </style>
 
 <!-- Hero Section (Desktop/Tablet View) -->
-<div class="d-none d-md-block p-4 p-md-5 mb-5 text-white rounded-4 overflow-hidden hero-gradient shadow-lg">
-    <!-- Blurred Decorative Background Blobs -->
-    <div class="hero-bg-blobs">
-        <div class="hero-blob hero-blob-1"></div>
-        <div class="hero-blob hero-blob-2"></div>
-    </div>
-    
-    <div class="row align-items-center py-2 py-md-4 position-relative" style="z-index: 2;">
-        <div class="col-lg-12 text-center text-lg-start">
-            <!-- Excellence in Market Slogan Badge -->
-            <div class="slogan-badge mb-3 animate-pulse-glow">
-                <i class="bi bi-patch-check-fill text-accent-bu"></i>
-                <span class="fw-bold">Excellence in Market</span>
-            </div>
-            
-            <h1 class="display-4 fw-extrabold mb-3">
-                Welcome to <span class="text-accent-bu text-gradient-gold">BU-MARKET</span>
-            </h1>
-            
-            <p class="fs-5 text-white-50 mb-4 col-lg-11">
-                The ultimate mobile-first community marketplace for Bugema University. Buy, sell, and find hostel items, textbooks, electronics, and jobs with ease.
-            </p>
-            
-            <!-- Hero Search Form -->
-            <form action="{% url 'core:browse' %}" method="get" class="search-hero-form mx-auto mx-lg-0 mb-4">
-                <div class="d-flex align-items-center w-100">
-                    <i class="bi bi-search text-muted ms-3 fs-5"></i>
-                    <input type="text" name="q" class="form-control border-0 bg-transparent py-3 px-3 shadow-none text-dark" placeholder="What are you looking for today?" aria-label="Search">
-                    <button type="submit" class="btn btn-primary-bu rounded-pill px-4 py-2 me-1">
-                        <span class="d-none d-sm-inline">Search</span>
-                        <i class="bi bi-search d-inline d-sm-none"></i>
-                    </button>
-                </div>
-            </form>
-            
-            <div class="d-flex gap-3 flex-wrap justify-content-center justify-content-lg-start mt-4">
-                <a href="{% url 'core:browse' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill shadow-sm">
-                    <i class="bi bi-bag-fill me-2"></i>Browse Listings
+<!-- Quick Action Bar -->
+<div class="bg-primary-bu rounded-4 shadow-sm mb-4 px-4 py-3">
+    <div class="row align-items-center g-3">
+        <div class="col-12 col-md-7 text-center text-md-start">
+            <h5 class="text-white fw-bold mb-0">Find what you need, or sell what you don't</h5>
+        </div>
+        <div class="col-12 col-md-5">
+            <div class="d-flex gap-2 justify-content-center justify-content-md-end flex-wrap">
+                <a href="{% url 'core:browse' %}" class="btn btn-light fw-semibold px-4 rounded-pill">
+                    <i class="bi bi-bag-fill me-1"></i> Browse Items
                 </a>
-                {% if not user.is_authenticated %}
-                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-lg px-4 py-2.5 rounded-pill">
-                        <i class="bi bi-shop me-2"></i>Sell on BU-MARKET
+                {% if user.is_authenticated and user.is_seller %}
+                    <a href="{% url 'dashboard:create_listing' %}" class="btn btn-outline-light fw-semibold px-4 rounded-pill">
+                        <i class="bi bi-plus-circle-fill me-1"></i> Post an Item
                     </a>
-                {% elif user.is_seller %}
-                    <a href="{% url 'dashboard:create_listing' %}" class="btn btn-accent-bu btn-lg px-4 py-2.5 rounded-pill shadow-sm">
-                        <i class="bi bi-plus-circle-fill me-2"></i>Post a Listing
+                {% elif not user.is_authenticated %}
+                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-light fw-semibold px-4 rounded-pill">
+                        <i class="bi bi-plus-circle-fill me-1"></i> Post an Item
                     </a>
                 {% endif %}
             </div>
         </div>
-        <!--
-        HERO IMAGE COLUMN (commented out — uncomment when real campus photos are ready)
-        <div class="col-lg-5 d-none d-lg-block mt-4 mt-lg-0 pe-0 position-relative" style="margin-right: -1.5rem; padding-right: 0 !important;">
-            <div class="hero-image-wrapper shadow-lg">
-                <div class="hero-image-overlay-left"></div>
-                <div class="hero-image-overlay-bottom"></div>
-                <div class="floating-hero-badge badge-top-right animate-float">
-                    <i class="bi bi-shield-check text-accent-bu fs-6"></i>
-                    <span class="fw-bold">100% Campus Verified</span>
-                </div>
-                <div class="floating-hero-badge badge-bottom-left animate-float-reverse" style="animation-delay: 1.2s;">
-                    <i class="bi bi-lightning-charge-fill text-accent-bu fs-6"></i>
-                    <span class="fw-bold">Fast WhatsApp Deals</span>
-                </div>
-                <div id="heroSellerCarousel" class="carousel slide carousel-fade h-100" data-bs-ride="carousel" data-bs-interval="3800">
-                    <div class="carousel-inner h-100">
-                        <div class="carousel-item active h-100">
-                            <img src="{% static 'images/hero_seller_1.png' %}" alt="BU student selling laptop" class="hero-seller-img hero-zoom-anim">
-                        </div>
-                        <div class="carousel-item h-100">
-                            <img src="{% static 'images/hero_seller_2.png' %}" alt="BU student selling textbooks" class="hero-seller-img hero-zoom-anim">
-                        </div>
-                        <div class="carousel-item h-100">
-                            <img src="{% static 'images/hero_seller_3.png' %}" alt="BU student selling household items" class="hero-seller-img hero-zoom-anim">
-                        </div>
-                    </div>
-                    <div class="carousel-indicators" style="bottom: 62px; z-index: 15;">
-                        <button type="button" data-bs-target="#heroSellerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                        <button type="button" data-bs-target="#heroSellerCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                        <button type="button" data-bs-target="#heroSellerCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        END HERO IMAGE COLUMN -->
     </div>
 </div>
 
@@ -494,6 +431,12 @@
 
     <!-- Horizontal Category Scroll Track -->
     <div class="category-scroll-track" id="catScrollTrack">
+            <a href="{% url 'core:hostel_list' %}" class="category-item-card">
+        <div class="category-icon-circle" style="background: var(--primary-color) !important; color: #f1f5f9 !important;">
+          <i class="bi bi-house-door-fill"></i>
+        </div>
+        <span class="category-item-name">Hostel Finder</span>
+      </a>
       {% for category in categories %}
         <a href="{% url 'core:browse' %}?category={{ category.slug }}" class="category-item-card">
           <div class="category-icon-circle">
@@ -527,125 +470,6 @@
 
 
 
-
-<!-- Why BU-MARKET? Features Section (Desktop/Tablet View) -->
-<div class="my-5 py-5 border-top border-bottom border-light features-container d-none d-md-block">
-    <div class="row align-items-center g-5">
-        <div class="col-lg-4 text-center text-lg-start">
-            <span class="features-tagline">The Campus Advantage</span>
-            <h2 class="features-title mt-2 mb-3">Why Shop & Sell on BU-MARKET?</h2>
-            <p class="text-muted mb-4 fs-5">
-                Built exclusively for the Bugema University community, we eliminate platform commissions and shipping delays.
-            </p>
-            <a href="{% url 'core:browse' %}" class="btn btn-outline-primary-bu rounded-pill px-4 py-2 fw-semibold">
-                Start Exploring <i class="bi bi-arrow-right ms-1"></i>
-            </a>
-        </div>
-        
-        <div class="col-lg-8">
-            <div class="row g-4">
-                <!-- Card 1 -->
-                <div class="col-md-6">
-                    <div class="feature-unique-card h-100">
-                        <div class="card-glow-element glow-blue"></div>
-                        <div class="card-content">
-                            <div class="feature-icon-spotlight spotlight-blue shadow-sm">
-                                <i class="bi bi-people-fill"></i>
-                            </div>
-                            <h5 class="fw-bold text-dark mb-3">Bugema Community First</h5>
-                            <p class="text-muted mb-3 small">
-                                Secure direct trading between students, staff, and campus sellers. Safe, localized, and verified.
-                            </p>
-                            <span class="badge bg-primary-bu bg-opacity-10 text-primary-bu border border-primary border-opacity-10 py-1.5 px-3 rounded-pill small">Localized</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Card 2 -->
-                <div class="col-md-6">
-                    <div class="feature-unique-card h-100">
-                        <div class="card-glow-element glow-green"></div>
-                        <div class="card-content">
-                            <div class="feature-icon-spotlight spotlight-green shadow-sm">
-                                <i class="bi bi-whatsapp"></i>
-                            </div>
-                            <h5 class="fw-bold text-dark mb-3">Instant Connections</h5>
-                            <p class="text-muted mb-3 small">
-                                Direct deals with no waiting. Reach out to the seller instantly via WhatsApp or direct phone call to seal the trade.
-                            </p>
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 py-1.5 px-3 rounded-pill small">Direct Trade</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Card 3 -->
-                <div class="col-lg-12">
-                    <div class="feature-unique-card">
-                        <div class="card-glow-element glow-gold"></div>
-                        <div class="card-content">
-                            <div class="row align-items-center g-3">
-                                <div class="col-sm-2 col-md-3 col-lg-2 text-center text-sm-start">
-                                    <div class="feature-icon-spotlight spotlight-gold shadow-sm mx-auto mb-0">
-                                        <i class="bi bi-coin"></i>
-                                    </div>
-                                </div>
-                                <div class="col-sm-10 col-md-9 col-lg-10">
-                                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-                                        <h5 class="fw-bold text-dark mb-0">Keep 100% of Your Profits</h5>
-                                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10 py-1.5 px-3 rounded-pill small">0% Commission</span>
-                                    </div>
-                                    <p class="text-muted mb-0 small">
-                                        Zero listing commissions or hidden buyer fees. What you negotiate is exactly what you pocket. BU-MARKET is entirely free for Bugema University sellers.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Why BU-MARKET? Features Section (Mobile View - Brief and Precise) -->
-<div class="d-block d-md-none my-4 py-4 px-3 bg-white border border-light rounded-4 shadow-sm">
-    <h4 class="fw-bold text-center text-primary-bu mb-4 fs-6">Why Shop & Sell on BU-MARKET?</h4>
-    <div class="d-flex flex-column gap-3">
-        <!-- Feature 1 -->
-        <div class="d-flex align-items-start gap-3">
-            <div class="flex-shrink-0 rounded-circle bg-primary-bu bg-opacity-10 text-primary-bu p-2.5 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
-                <i class="bi bi-people-fill fs-5"></i>
-            </div>
-            <div>
-                <h6 class="fw-bold mb-0.5 text-dark" style="font-size: 0.9rem;">Campus Verified</h6>
-                <p class="text-muted mb-0" style="font-size: 0.75rem;">Direct and safe trading between students & staff.</p>
-            </div>
-        </div>
-        
-        <!-- Feature 2 -->
-        <div class="d-flex align-items-start gap-3">
-            <div class="flex-shrink-0 rounded-circle bg-success bg-opacity-10 text-success p-2.5 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
-                <i class="bi bi-whatsapp fs-5"></i>
-            </div>
-            <div>
-                <h6 class="fw-bold mb-0.5 text-dark" style="font-size: 0.9rem;">Instant Deals</h6>
-                <p class="text-muted mb-0" style="font-size: 0.75rem;">Connect directly via phone call or WhatsApp button.</p>
-            </div>
-        </div>
-        
-        <!-- Feature 3 -->
-        <div class="d-flex align-items-start gap-3">
-            <div class="flex-shrink-0 rounded-circle bg-warning bg-opacity-10 text-warning p-2.5 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
-                <i class="bi bi-coin fs-5"></i>
-            </div>
-            <div>
-                <h6 class="fw-bold mb-0.5 text-dark" style="font-size: 0.9rem;">0% Commission</h6>
-                <p class="text-muted mb-0" style="font-size: 0.75rem;">List for free and pocket 100% of your profits.</p>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Promoted Listings -->
 {% if promoted_listings %}
