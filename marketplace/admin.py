@@ -4,7 +4,15 @@ from django.forms import BaseInlineFormSet
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
-from .models import Category, Listing, Hostel, HostelImage
+from .models import Category, Listing, Hostel, HostelImage, Community, Offer
+
+@admin.register(Community)
+class CommunityAdmin(admin.ModelAdmin):
+    list_display = ['name', 'hub_type', 'region', 'order', 'is_active']
+    list_filter = ['hub_type', 'region', 'is_active']
+    search_fields = ['name', 'region']
+    prepopulated_fields = {'slug': ('name',)}
+    list_editable = ['order', 'is_active']
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -79,3 +87,11 @@ class HostelAdmin(admin.ModelAdmin):
     search_fields = ['name', 'location', 'owner__username']
     prepopulated_fields = {'slug': ('name',)}
     inlines = [HostelImageInline]
+
+
+@admin.register(Offer)
+class OfferAdmin(admin.ModelAdmin):
+    list_display = ['id', 'listing', 'buyer', 'seller', 'original_price', 'offered_price', 'counter_price', 'status', 'deal_code', 'created_at']
+    list_filter = ['status', 'created_at']
+    search_fields = ['listing__title', 'buyer__username', 'seller__username', 'deal_code']
+    readonly_fields = ['created_at', 'updated_at']

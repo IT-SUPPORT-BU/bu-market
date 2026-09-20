@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.conf import settings
 from core.validators import validate_file_size
+import uuid
+import urllib.parse
 
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -263,6 +265,119 @@ class HostelImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.hostel.name}"
+
+
+class Offer(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'Pending Review ⏳'
+        COUNTERED = 'COUNTERED', 'Counter Offer ⚡'
+        ACCEPTED = 'ACCEPTED', 'Offer Accepted 🎉'
+        DECLINED = 'DECLINED', 'Declined ❌'
+        CANCELLED = 'CANCELLED', 'Cancelled'
+
+    listing = models.ForeignKey(
+        Listing,
+        on_delete=models.CASCADE,
+        related_name='offers'
+    )
+    buyer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='offers_made'
+    )
+    seller = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='offers_received'
+    )
+    original_price = models.DecimalField(max_digits=12, decimal_places=2)
+    offered_price = models.DecimalField(max_digits=12, decimal_places=2)
+    counter_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    buyer_note = models.CharField(max_length=255, blank=True, default='')
+    seller_note = models.CharField(max_length=255, blank=True, default='')
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    deal_code = models.CharField(max_length=32, unique=True, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f"Offer #{self.id} on {self.listing.title} by {self.buyer.username} - {self.status}"
+
+    @property
+    def final_price(self):
+        """Returns the accepted/countered price or the offered price."""
+        if self.status == self.Status.ACCEPTED:
+            return self.counter_price if self.counter_price else self.offered_price
+        elif self.status == self.Status.COUNTERED and self.counter_price:
+            return self.counter_price
+        return self.offered_price
+
+    @property
+    def savings_amount(self):
+        price = self.final_price
+        if self.original_price and price and self.original_price > price:
+            return self.original_price - price
+        return 0
+
+    @property
+    def discount_percent(self):
+        if self.original_price and self.original_price > 0:
+            savings = self.savings_amount
+            return round((savings / self.original_price) * 100)
+        return 0
+
+    def generate_deal_code(self):
+        if not self.deal_code:
+            short_id = uuid.uuid4().hex[:6].upper()
+            self.deal_code = f"BUM-DEAL-{short_id}"
+
+    def get_whatsapp_url(self, recipient_role='seller'):
+        """
+        Generates a direct WhatsApp link with prefilled deal pass text.
+        """
+        if recipient_role == 'seller':
+            phone = self.listing.whatsapp_number or getattr(self.seller, 'phone_number', None)
+            target_name = self.seller.username
+        else:
+            phone = getattr(self.buyer, 'phone_number', None)
+            target_name = self.buyer.username
+
+        if not phone:
+            return None
+
+        cleaned = "".join(c for c in str(phone) if c.isdigit())
+        if cleaned.startswith('0'):
+            cleaned = '256' + cleaned[1:]
+        elif not cleaned.startswith('256') and len(cleaned) == 9:
+            cleaned = '256' + cleaned
+
+        price_formatted = f"{self.final_price:,.0f} UGX" if self.final_price else "Agreed Price"
+        orig_formatted = f"{self.original_price:,.0f} UGX" if self.original_price else ""
+        deal_ref = self.deal_code or f"OFFER-{self.id}"
+
+        if self.status == self.Status.ACCEPTED:
+            msg = (
+                f"🤝 *BU-MARKET DEAL CONFIRMED!* 🔒\n\n"
+                f"Hey @{target_name}, our bargain for *'{self.listing.title}'* is officially agreed on BU-MARKET!\n\n"
+                f"💰 *Agreed Price:* {price_formatted} (Original: {orig_formatted})\n"
+                f"🎟️ *Deal Pass Code:* {deal_ref}\n"
+                f"📍 *Campus Hub:* {self.listing.community.name if self.listing.community else 'Main Campus'}\n\n"
+                f"Let's coordinate where to meet on campus for pickup & inspection! 🚀"
+            )
+        else:
+            msg = (
+                f"👋 *BU-MARKET Bargain Offer*\n\n"
+                f"Hey @{target_name}, I saw *'{self.listing.title}'* on BU-MARKET and proposed an offer of *{price_formatted}*.\n"
+                f"Deal Ref: #{deal_ref}\n\n"
+                f"Let me know if we can deal! 🤝"
+            )
+
+        encoded_msg = urllib.parse.quote(msg)
+        return f"https://wa.me/{cleaned}?text={encoded_msg}"
+
 
 
 
