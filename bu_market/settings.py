@@ -31,7 +31,28 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-bu-market-secret-key-12345
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,bumarket.pythonanywhere.com,.pythonanywhere.com').split(',') if h.strip()]
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', '*').split(',') if h.strip()]
+
+# Automatically allow Vercel domains and local environments
+for host in ['.vercel.app', '.now.sh', '127.0.0.1', 'localhost']:
+    if host not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
+
+vercel_url = os.getenv('VERCEL_URL')
+if vercel_url and vercel_url not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(vercel_url)
+
+# CSRF Trusted Origins for Vercel and Production
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.vercel.app',
+    'https://*.now.sh',
+    'https://*.supabase.co',
+]
+if vercel_url:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{vercel_url}")
+extra_csrf = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+if extra_csrf:
+    CSRF_TRUSTED_ORIGINS.extend([c.strip() for c in extra_csrf.split(',') if c.strip()])
 
 
 # Application definition
@@ -149,32 +170,23 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Media files & Cloud Storage
+# Media files & Cloud Storage (Supabase)
 SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_SERVICE_ROLE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
 SUPABASE_STORAGE_BUCKET = os.getenv('SUPABASE_STORAGE_BUCKET', 'media')
 
-if SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY:
-    STORAGES = {
-        "default": {
-            "BACKEND": "core.storage.SupabaseMediaStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-    MEDIA_URL = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{SUPABASE_STORAGE_BUCKET}/"
-else:
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'media'
+if not (SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY):
+    raise ImproperlyConfigured("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables are required for cloud media storage.")
+
+STORAGES = {
+    "default": {
+        "BACKEND": "core.storage.SupabaseMediaStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
+MEDIA_URL = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{SUPABASE_STORAGE_BUCKET}/"
 
 # Custom User model
 AUTH_USER_MODEL = 'accounts.User'
