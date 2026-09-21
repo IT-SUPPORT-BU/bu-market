@@ -186,6 +186,16 @@ class Hostel(models.Model):
         ACTIVE = 'ACTIVE', 'Active'
         REJECTED = 'REJECTED', 'Rejected'
 
+    class RentalType(models.TextChoices):
+        HOSTEL = 'HOSTEL', 'Student Hostel (Single / Shared)'
+        BEDSITTER = 'BEDSITTER', 'Bedsitter & Studio Apartment'
+        RESIDENTIAL = 'RESIDENTIAL', '1 & 2 Bedroom Residential Rental'
+        COMMERCIAL = 'COMMERCIAL', 'Commercial Space & Market Stall'
+
+    class BillingCycle(models.TextChoices):
+        PER_MONTH = 'PER_MONTH', 'Per Month'
+        PER_SEMESTER = 'PER_SEMESTER', 'Per Semester'
+
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -193,6 +203,18 @@ class Hostel(models.Model):
     )
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=120, unique=True, blank=True)
+    rental_type = models.CharField(
+        max_length=30,
+        choices=RentalType.choices,
+        default=RentalType.HOSTEL,
+        verbose_name="Rental Category"
+    )
+    billing_cycle = models.CharField(
+        max_length=20,
+        choices=BillingCycle.choices,
+        default=BillingCycle.PER_SEMESTER,
+        verbose_name="Billing Cycle"
+    )
     community = models.ForeignKey(
         Community,
         on_delete=models.SET_NULL,
@@ -205,8 +227,15 @@ class Hostel(models.Model):
     description = models.TextField(
         blank=True,
         null=True,
-        help_text="Optional extra info about the hostel"
+        help_text="Detailed info about the rental unit, rules, terms, etc."
     )
+    # Universal Amenities
+    is_self_contained = models.BooleanField(default=False, verbose_name="Self-Contained (Private Washroom)")
+    has_yaka_meter = models.BooleanField(default=False, verbose_name="Prepaid Yaka Electricity Meter")
+    has_water_reserve = models.BooleanField(default=False, verbose_name="Water Reserve / Tank / Borehole")
+    has_security = models.BooleanField(default=False, verbose_name="Gated Compound / 24/7 Security")
+    has_parking = models.BooleanField(default=False, verbose_name="Parking Space Available")
+
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     whatsapp_number = models.CharField(max_length=20, blank=True, null=True)
     is_active = models.BooleanField(default=True)
@@ -215,6 +244,30 @@ class Hostel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "Housing & Rental"
+        verbose_name_plural = "Housing & Rentals"
+        ordering = ['-created_at']
+
+    @property
+    def billing_display(self):
+        return "/ mo" if self.billing_cycle == self.BillingCycle.PER_MONTH else "/ sem"
+
+    @property
+    def amenities_list(self):
+        items = []
+        if self.is_self_contained:
+            items.append({'name': 'Self-Contained', 'icon': 'bi-door-closed-fill', 'badge': 'bg-primary-subtle text-primary-emphasis'})
+        if self.has_yaka_meter:
+            items.append({'name': 'Prepaid Yaka Meter', 'icon': 'bi-lightning-charge-fill', 'badge': 'bg-warning-subtle text-warning-emphasis'})
+        if self.has_water_reserve:
+            items.append({'name': 'Water Reserve / Borehole', 'icon': 'bi-droplet-fill', 'badge': 'bg-info-subtle text-info-emphasis'})
+        if self.has_security:
+            items.append({'name': 'Gated / 24/7 Security', 'icon': 'bi-shield-check', 'badge': 'bg-success-subtle text-success-emphasis'})
+        if self.has_parking:
+            items.append({'name': 'Parking Available', 'icon': 'bi-p-circle-fill', 'badge': 'bg-secondary-subtle text-secondary-emphasis'})
+        return items
+
     @property
     def whatsapp_url(self):
         if not self.whatsapp_number:
@@ -222,7 +275,20 @@ class Hostel(models.Model):
         cleaned = "".join(c for c in self.whatsapp_number if c.isdigit())
         if cleaned.startswith('0'):
             cleaned = '256' + cleaned[1:]
-        return f"https://wa.me/{cleaned}"
+        elif not cleaned.startswith('256') and len(cleaned) == 9:
+            cleaned = '256' + cleaned
+
+        msg = (
+            f"🏠 *BU-MARKET HOUSING & RENTALS INQUIRY*\n\n"
+            f"Hello @{self.owner.username}, I saw your rental listing on BU-MARKET:\n"
+            f"🏢 *Property:* {self.name}\n"
+            f"🏷️ *Category:* {self.get_rental_type_display()}\n"
+            f"💰 *Price:* {self.price:,.0f} UGX ({self.get_billing_cycle_display()})\n"
+            f"📍 *Location:* {self.location}"
+            + (f" ({self.community.name})" if self.community else "") + "\n\n"
+            f"Is this unit currently vacant for inspection? Looking forward to your response! 🚀"
+        )
+        return f"https://wa.me/{cleaned}?text={urllib.parse.quote(msg)}"
 
     def save(self, *args, **kwargs):
         if not self.slug:

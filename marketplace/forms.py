@@ -27,16 +27,21 @@ class ListingForm(forms.ModelForm):
 
 
 class HostelForm(forms.ModelForm):
-    image_1 = forms.ImageField(required=True)
-    image_2 = forms.ImageField(required=False)
-    image_3 = forms.ImageField(required=False)
-    image_4 = forms.ImageField(required=False)
+    image_1 = forms.ImageField(required=True, label="Main Cover Photo")
+    image_2 = forms.ImageField(required=False, label="Photo 2 (Interior / Washroom)")
+    image_3 = forms.ImageField(required=False, label="Photo 3 (Compound / Kitchen)")
+    image_4 = forms.ImageField(required=False, label="Photo 4 (Surroundings)")
 
     class Meta:
         model = Hostel
-        fields = ['name', 'community', 'location', 'price', 'description', 'phone_number', 'whatsapp_number']
+        fields = [
+            'name', 'rental_type', 'billing_cycle', 'community', 'location',
+            'price', 'description', 'is_self_contained', 'has_yaka_meter',
+            'has_water_reserve', 'has_security', 'has_parking',
+            'phone_number', 'whatsapp_number'
+        ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 4}),
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Describe the property, water access, security, terms, and neighborhood...'}),
         }
 
     def __init__(self, *args, **kwargs):

@@ -82,9 +82,9 @@ class HostelImageInline(admin.TabularInline):
 
 @admin.register(Hostel)
 class HostelAdmin(admin.ModelAdmin):
-    list_display = ['name', 'owner', 'location', 'price', 'is_active']
-    list_filter = ['is_active']
-    search_fields = ['name', 'location', 'owner__username']
+    list_display = ['name', 'rental_type', 'billing_cycle', 'price', 'community', 'location', 'is_self_contained', 'has_yaka_meter', 'is_active', 'status']
+    list_filter = ['rental_type', 'billing_cycle', 'community', 'is_self_contained', 'has_yaka_meter', 'has_security', 'status', 'is_active']
+    search_fields = ['name', 'location', 'owner__username', 'description']
     prepopulated_fields = {'slug': ('name',)}
     inlines = [HostelImageInline]
 
