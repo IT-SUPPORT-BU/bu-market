@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from marketplace import views as marketplace_views
 
+
 app_name = 'core'
 
 urlpatterns = [
@@ -17,4 +18,5 @@ urlpatterns = [
     path('community/switch/<slug:slug>/', views.switch_community, name='switch_community'),
     path('hostels/', marketplace_views.browse_hostels, name='hostel_list'),
     path('hostels/<slug:slug>/', marketplace_views.hostel_detail, name='hostel_detail'),
+    path('quick-sale/', marketplace_views.quick_sale_list, name='quick_sale_list'),
 ]

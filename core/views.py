@@ -73,6 +73,13 @@ class HomeView(ListView):
                 promoted_qs = promoted_qs.filter(community=active_comm)
 
         context['promoted_listings'] = promoted_qs.order_by('-created_at')[:4]
+
+        context['quick_sale_items'] = Listing.objects.filter(
+            status=Listing.Status.ACTIVE,
+            is_quick_sale=True,
+            quick_sale_expires_at__gt=timezone.now()
+        ).order_by('-created_at')[:10]
+
         return context
 
 
@@ -151,7 +158,6 @@ class BrowseView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.filter(is_active=True)
-        # Preserve filters in pagination
         query_params = self.request.GET.copy()
         if 'page' in query_params:
             query_params.pop('page')
@@ -165,7 +171,6 @@ class ListingDetailView(DetailView):
     context_object_name = 'listing'
 
     def get_object(self, queryset=None):
-        # Allow owner, moderator, or admin to view non-active listings
         listing = get_object_or_404(Listing, slug=self.kwargs.get('slug'))
         user = self.request.user
 
@@ -182,11 +187,9 @@ class ListingDetailView(DetailView):
                 from django.http import Http404
                 raise Http404("Listing not found or pending moderation.")
 
-        # Increment view count
         listing.views_count += 1
         listing.save(update_fields=['views_count'])
 
-        # Track recently viewed listings in session
         recently_viewed = self.request.session.get('recently_viewed', [])
         if listing.id in recently_viewed:
             recently_viewed.remove(listing.id)
@@ -211,7 +214,6 @@ def seller_profile(request, username):
     seller = get_object_or_404(User, username=username, role=User.Role.SELLER)
     listings = Listing.objects.filter(seller=seller, status=Listing.Status.ACTIVE).order_by('-is_promoted')
 
-    # Get active subscription badge
     active_sub = seller.active_subscription
     badge = active_sub.plan.badge if active_sub else 'none'
 
@@ -276,7 +278,6 @@ def make_offer(request, slug):
 
         buyer_note = request.POST.get('buyer_note', '').strip()[:255]
 
-        # Fetch or create offer for this buyer on this listing
         offer, created = Offer.objects.get_or_create(
             listing=listing,
             buyer=request.user,
@@ -297,7 +298,6 @@ def make_offer(request, slug):
             offer.status = Offer.Status.PENDING
             offer.save()
 
-        # Connect with in-app Conversation
         try:
             conversation, _ = Conversation.objects.get_or_create(
                 listing=listing,
@@ -342,7 +342,7 @@ def respond_offer(request, offer_id):
         return redirect('core:home')
 
     if request.method == 'POST':
-        action = request.POST.get('action')  # 'accept', 'counter', 'decline'
+        action = request.POST.get('action')
         note = request.POST.get('note', '').strip()[:255]
 
         if action == 'accept':
@@ -354,7 +354,6 @@ def respond_offer(request, offer_id):
                 offer.buyer_note = note or "Counter offer accepted! Deal locked 🎉"
             offer.save()
 
-            # Post notification into chat
             try:
                 conv = Conversation.objects.filter(listing=offer.listing, buyer=offer.buyer, seller=offer.seller).first()
                 if conv:
@@ -469,4 +468,4 @@ def my_offers(request):
         'pending_received_count': offers_received.filter(status=Offer.Status.PENDING).count(),
         'active_bargains_count': offers_made.filter(status__in=[Offer.Status.PENDING, Offer.Status.COUNTERED]).count(),
     }
-    return render(request, 'marketplace/my_offers.html', context)
+    return render(request, 'marketplace/deal_receipt.html', context)

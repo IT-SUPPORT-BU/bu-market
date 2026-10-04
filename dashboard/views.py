@@ -3,10 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
-from subscriptions.models import SellerSubscription, SubscriptionPlan
+from subscriptions.models import SellerSubscription, SubscriptionPlan, BuyerMembership
 from accounts.models import User
-from marketplace.forms import ListingForm, HostelForm
 from marketplace.models import Listing, Category, Hostel, HostelImage
+from datetime import timedelta
+from marketplace.forms import ListingForm, HostelForm, QuickSaleForm
+
 
 # Role verification decorators
 def role_required(allowed_roles):
@@ -46,7 +48,9 @@ def seller_dashboard(request):
     # Calculate counts and sums
     from django.db.models import Sum
     active_listings_count = listings.filter(status=Listing.Status.ACTIVE).count()
+    suspended_listings = listings.filter(status=Listing.Status.SUSPENDED)
     total_views = listings.aggregate(Sum('views_count'))['views_count__sum'] or 0
+    suspended_hostels = Hostel.objects.filter(owner=user, status=Hostel.Status.SUSPENDED)
     
     # Active subscription check
     active_sub = user.active_subscription
@@ -57,10 +61,13 @@ def seller_dashboard(request):
     context = {
         'listings': listings,
         'active_listings_count': active_listings_count,
+        'suspended_listings': suspended_listings,
+        'suspended_hostels': suspended_hostels,
         'total_views': total_views,
         'active_sub': active_sub,
         'history': history,
         'plans': SubscriptionPlan.objects.all(),
+        
     }
     return render(request, 'dashboard/seller_dashboard.html', context)
 
@@ -97,8 +104,8 @@ def create_listing(request):
 @login_required
 @role_required([User.Role.SELLER])
 def create_hostel(request):
-    if not request.user.has_active_subscription:
-        messages.error(request, "You must have an active approved subscription to post a hostel.")
+    if not request.user.has_active_hostel_subscription:
+        messages.error(request, "You need an active Hostel subscription to post here.")
         return redirect('dashboard:seller_dashboard')
 
     if request.method == 'POST':
@@ -131,9 +138,9 @@ def edit_listing(request, slug):
         form = ListingForm(request.POST, request.FILES, instance=listing, user=request.user)
         if form.is_valid():
             listing = form.save(commit=False)
-            listing.status = Listing.Status.PENDING # Re-moderate on edit
+            listing.seller = request.user
             listing.save()
-            messages.success(request, f'Listing "{listing.title}" updated successfully and is pending moderation!')
+            messages.success(request, f'Listing "{listing.title}" created successfully and is now live!')
             return redirect('dashboard:seller_listings')
     else:
         form = ListingForm(instance=listing, user=request.user)
@@ -175,6 +182,7 @@ def admin_dashboard(request):
     total_listings = Listing.objects.count()
     active_listings = Listing.objects.filter(status=Listing.Status.ACTIVE).count()
     pending_listings = Listing.objects.filter(status=Listing.Status.PENDING).count()
+    suspended_listings = Listing.objects.filter(status=Listing.Status.SUSPENDED).count()
     
     total_sellers = User.objects.filter(role=User.Role.SELLER).count()
     active_subscriptions = SellerSubscription.objects.filter(
@@ -191,8 +199,33 @@ def admin_dashboard(request):
         'total_listings': total_listings,
         'active_listings': active_listings,
         'pending_listings': pending_listings,
+        'suspended_listings': suspended_listings,
         'total_sellers': total_sellers,
         'active_subscriptions': active_subscriptions,
         'pending_payments': pending_payments,
     }
     return render(request, 'dashboard/admin_dashboard.html', context)
+
+
+@login_required
+@role_required([User.Role.SELLER])
+def create_quick_sale(request):
+    active_sub = request.user.active_quick_sale_subscription
+    if not active_sub:
+        messages.error(request, "You need an active Quick Sale subscription to post here.")
+        return redirect('dashboard:seller_dashboard')
+
+    if request.method == 'POST':
+        form = QuickSaleForm(request.POST, request.FILES, user=request.user)
+        if form.is_valid():
+            listing = form.save(commit=False)
+            listing.seller = request.user
+            listing.is_quick_sale = True
+            listing.quick_sale_expires_at = timezone.now() + timedelta(days=active_sub.plan.duration_days)
+            listing.save()
+            messages.success(request, f'"{listing.title}" posted as Quick Sale!')
+            return redirect('dashboard:seller_dashboard')
+    else:
+        form = QuickSaleForm(user=request.user)
+
+    return render(request, 'dashboard/quick_sale_form.html', {'form': form, 'title': 'Post Quick Sale Item'})
